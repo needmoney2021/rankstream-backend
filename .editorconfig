@@ -1,0 +1,11 @@
+[{*.kt,*.kts}]
+
+indent_size = 4
+indent_style = space
+end_of_line = crlf
+
+[*.yml]
+
+indent_size = 2
+indent_style = space
+end_of_line = crlf
