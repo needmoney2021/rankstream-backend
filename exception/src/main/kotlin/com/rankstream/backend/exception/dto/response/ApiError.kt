@@ -2,12 +2,23 @@ package com.rankstream.backend.exception.dto.response
 
 import com.rankstream.backend.exception.enums.ErrorCode
 
-class ApiError(
-    errorCode: ErrorCode,
+data class ApiError(
+    val code: String,
+    val message: String
 ) {
+    companion object {
+        fun of(errorCode: ErrorCode): ApiError {
+            return ApiError(
+                code = errorCode.name,
+                message = errorCode.message
+            )
+        }
 
-    val code: String = errorCode.name
-
-    val message: String = errorCode.message
-
+        fun of(errorCode: ErrorCode, message: String): ApiError {
+            return ApiError(
+                code = errorCode.name,
+                message = message
+            )
+        }
+    }
 }
