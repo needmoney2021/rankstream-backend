@@ -1,77 +1,78 @@
 package com.rankstream.backend.domain.company.entity
 
 import com.rankstream.backend.domain.auditor.TimestampEntityListener
-import com.rankstream.backend.domain.company.code.entity.Code
-import com.rankstream.backend.domain.company.enums.CompanyState
-import com.rankstream.backend.domain.company.enums.Hierarchy
+import com.rankstream.backend.domain.enums.Hierarchy
+import com.rankstream.backend.domain.enums.State
+import com.rankstream.backend.domain.member.entity.Member
 import jakarta.persistence.*
+import jakarta.persistence.Index
+import org.hibernate.proxy.HibernateProxy
+import java.util.*
 
 @Entity
 @Table(
     name = "company",
     indexes = [
-        Index(name = "IDX_COMPANY_STATE", columnList = "state", unique = false),
-        Index(name = "IDX_BUSINESS_LICENSE_ID", columnList = "business_licence_id", unique = true)
+        Index(name = "IDX-COMPANY-NAME", columnList = "company_name"),
+        Index(name = "IDX-COMPANY-STATE", columnList = "state"),
+        Index(name = "UIDX-COMPANY-LICENSE", columnList = "business_license", unique = true)
     ]
 )
 class Company(
-
     @Id
-    @Column(name = "idx")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val idx: Long? = null,
 
-    @Column(name = "business_licence_id", nullable = false, length = 20)
-    val businessLicenceId: String,
+    @Column(length = 20, nullable = false)
+    val businessLicense: String,
 
-    @Column(name = "representative_name", nullable = false, length = 20)
-    val representativeName: String,
+    @Column(length = 20, nullable = false)
+    val representative: String,
 
-    @Column(name = "company_name", nullable = false, length = 20)
+    @Column(length = 20, nullable = false)
     val companyName: String,
 
-    @Column(name = "phone", nullable = false, length = 20)
+    @Column(length = 20, nullable = false)
     var phone: String,
 
-    @Column(name = "email", nullable = false, length = 50)
+    @Column(length = 50, nullable = false)
     var email: String,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns(value = [JoinColumn(name = "super_code"), JoinColumn(name = "sub_code")])
-    val country: Code,
-
-    @Column(name = "postal_code", nullable = false, length = 10)
+    @Column(length = 10, nullable = false)
     var postalCode: String,
 
-    @Column(name = "address", nullable = false, length = 100)
+    @Column(length = 100, nullable = false)
     var address: String,
 
-    @Column(name = "address_detail", nullable = false, length = 100)
+    @Column(length = 100, nullable = false)
     var addressDetail: String,
 
-    @Column(name = "state", nullable = false, length = 15)
     @Enumerated(EnumType.STRING)
-    var state: CompanyState = CompanyState.ACTIVE,
+    @Column(length = 15, nullable = false)
+    var state: State,
 
-    @Column(name = "hierarchy", nullable = false, length = 10)
     @Enumerated(EnumType.STRING)
+    @Column(length = 10, nullable = false)
     var hierarchy: Hierarchy,
 
-    @Column(name = "max_children", nullable = true)
-    var maximumNumberOfChildren: Int = 2
-
+    @OneToMany(mappedBy = "company", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val members: MutableList<Member> = mutableListOf()
 ) : TimestampEntityListener() {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is Company) return false
-
-        if (businessLicenceId != other.businessLicenceId) return false
-
-        return true
+        if (other == null) return false
+        
+        val otherCompany = when (other) {
+            is HibernateProxy -> (other.hibernateLazyInitializer.implementation as? Company)
+            is Company -> other
+            else -> return false
+        } ?: return false
+        
+        return idx != null && idx == otherCompany.idx
     }
 
-    override fun hashCode(): Int {
-        return businessLicenceId.hashCode()
-    }
+    override fun hashCode(): Int = Objects.hash(idx)
 
-}
+    override fun toString(): String = "Company(idx=$idx, companyName='$companyName')"
+} 

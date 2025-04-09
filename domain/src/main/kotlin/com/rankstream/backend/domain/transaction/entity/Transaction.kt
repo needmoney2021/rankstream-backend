@@ -1,69 +1,74 @@
 package com.rankstream.backend.domain.transaction.entity
 
 import com.rankstream.backend.domain.auditor.TimestampEntityListener
-import com.rankstream.backend.domain.company.entity.Company
-import com.rankstream.backend.domain.transaction.enums.TxState
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.FetchType
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.OneToMany
-import jakarta.persistence.Table
+import com.rankstream.backend.domain.enums.TransactionState
+import com.rankstream.backend.domain.member.entity.Member
+import jakarta.persistence.*
+import jakarta.persistence.Index
+import org.hibernate.proxy.HibernateProxy
 import java.time.LocalDateTime
+import java.util.*
 
 @Entity
-@Table(name = "transaction")
+@Table(
+    name = "transaction",
+    indexes = [
+        Index(name = "IDX-TRANSACTION-MEMBER", columnList = "member_idx"),
+        Index(name = "IDX-TRANSACTION-ID", columnList = "transaction_id"),
+        Index(name = "IDX-TRANSACTION-STATE", columnList = "state"),
+        Index(name = "IDX-TRANSACTION-ORDERED", columnList = "ordered_at"),
+        Index(name = "IDX-TRANSACTION-CLOSED", columnList = "closed")
+    ]
+)
 class Transaction(
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idx", nullable = false)
     val idx: Long? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id")
-    val company: Company,
+    @JoinColumn(name = "member_idx", nullable = false)
+    val member: Member,
 
-    @Column(name = "transaction_id", nullable = false, length = 32)
+    @Column(length = 30, nullable = false)
     val transactionId: String,
 
-    @Column(name = "state", nullable = false, length = 9)
+    @Column(nullable = false)
+    val amount: Double,
+
+    @Column(nullable = false)
+    val gradePoint: Double,
+
+    @Column(nullable = false)
+    val businessPoint: Double,
+
+    @Column(nullable = false)
+    val valueAddedTax: Double,
+
     @Enumerated(EnumType.STRING)
-    val state: TxState = TxState.COMPLETED,
+    @Column(length = 10, nullable = false)
+    var state: TransactionState,
 
-    @Column(name = "amount", nullable = false)
-    var amount: Double,
+    @Column(nullable = false)
+    val orderedAt: LocalDateTime,
 
-    @Column(name = "rank_point", nullable = false)
-    var rankPoint: Double,
-
-    @Column(name = "benefit_point", nullable = false)
-    var benefitPoint: Double,
-
-    @Column(name = "date_of_issue", nullable = false)
-    val dateOfIssue: LocalDateTime,
-
-    @OneToMany(mappedBy = "transaction")
-    val histories: List<TransactionHistory> = mutableListOf(),
-
+    @Column(nullable = false)
+    var closed: Boolean
 ) : TimestampEntityListener() {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is Transaction) return false
-
-        if (idx != other.idx) return false
-
-        return true
+        if (other == null) return false
+        
+        val otherTransaction = when (other) {
+            is HibernateProxy -> (other.hibernateLazyInitializer.implementation as? Transaction)
+            is Transaction -> other
+            else -> return false
+        } ?: return false
+        
+        return idx != null && idx == otherTransaction.idx
     }
 
-    override fun hashCode(): Int {
-        return idx?.hashCode() ?: 0
-    }
-}
+    override fun hashCode(): Int = Objects.hash(idx)
+
+    override fun toString(): String = "Transaction(idx=$idx, transactionId='$transactionId', amount=$amount)"
+} 
