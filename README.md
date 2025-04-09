@@ -12,13 +12,13 @@
 ## Project Structures
 
 ```text
-backend
+rankstream-backend
 
 |
 | api
 | - internal-api
 | - external-api (TODO)
-| auth (TODO)
+| auth
 | config
 | domain
 | exception

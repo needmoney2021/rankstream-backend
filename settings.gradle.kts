@@ -7,3 +7,4 @@ include("config")
 include("exception")
 include("api:internal-api")
 findProject(":api:internal-api")?.name = "internal-api"
+include("auth")
