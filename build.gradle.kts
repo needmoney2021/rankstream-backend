@@ -3,7 +3,7 @@ plugins {
     kotlin("plugin.spring") version "2.1.20"
     kotlin("plugin.jpa") version "2.1.20" apply false
     kotlin("kapt") version "2.1.20"
-    id("org.springframework.boot") version "3.4.3"
+    id("org.springframework.boot") version "3.4.4"
     id("io.spring.dependency-management") version "1.1.7"
 }
 
@@ -45,7 +45,7 @@ subprojects {
         implementation("org.springframework.boot:spring-boot-starter-validation")
         implementation("org.springframework.boot:spring-boot-starter-web")
         implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-        implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.3")
+        implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
         implementation("org.jetbrains.kotlin:kotlin-reflect")
         developmentOnly("org.springframework.boot:spring-boot-devtools")
         testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -54,6 +54,7 @@ subprojects {
         testImplementation("io.kotest.extensions:kotest-extensions-spring:1.3.0")
         testImplementation("io.mockk:mockk:1.13.17")
     }
+
 }
 
 
