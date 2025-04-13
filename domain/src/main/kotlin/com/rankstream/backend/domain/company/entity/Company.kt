@@ -13,9 +13,9 @@ import java.util.*
 @Table(
     name = "company",
     indexes = [
-        Index(name = "IDX-COMPANY-NAME", columnList = "company_name"),
-        Index(name = "IDX-COMPANY-STATE", columnList = "state"),
-        Index(name = "UIDX-COMPANY-LICENSE", columnList = "business_license", unique = true)
+        Index(name = "IDX_COMPANY_NAME", columnList = "company_name"),
+        Index(name = "IDX_COMPANY_STATE", columnList = "state"),
+        Index(name = "UIDX_COMPANY_LICENSE", columnList = "business_license", unique = true)
     ]
 )
 class Company(
@@ -62,17 +62,17 @@ class Company(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null) return false
-        
+
         val otherCompany = when (other) {
             is HibernateProxy -> (other.hibernateLazyInitializer.implementation as? Company)
             is Company -> other
             else -> return false
         } ?: return false
-        
+
         return idx != null && idx == otherCompany.idx
     }
 
     override fun hashCode(): Int = Objects.hash(idx)
 
     override fun toString(): String = "Company(idx=$idx, companyName='$companyName')"
-} 
+}

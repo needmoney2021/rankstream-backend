@@ -14,8 +14,8 @@ import java.util.*
 @Table(
     name = "member",
     indexes = [
-        Index(name = "IDX-MEMBER-STATE-COMPANY", columnList = "state, company_idx"),
-        Index(name = "UIDX-MEMBER-ID-COMPANY", columnList = "member_id, company_idx", unique = true)
+        Index(name = "IDX_MEMBER_STATE_COMPANY", columnList = "state, company_idx"),
+        Index(name = "UIDX_MEMBER_ID_COMPANY", columnList = "member_id, company_idx", unique = true)
     ]
 )
 class Member(
@@ -49,17 +49,17 @@ class Member(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null) return false
-        
+
         val otherMember = when (other) {
             is HibernateProxy -> (other.hibernateLazyInitializer.implementation as? Member)
             is Member -> other
             else -> return false
         } ?: return false
-        
+
         return idx != null && idx == otherMember.idx
     }
 
     override fun hashCode(): Int = Objects.hash(idx)
 
     override fun toString(): String = "Member(idx=$idx, memberId='$memberId', memberName='$memberName')"
-} 
+}

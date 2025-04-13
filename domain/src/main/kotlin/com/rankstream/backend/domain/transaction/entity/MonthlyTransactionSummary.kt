@@ -11,8 +11,8 @@ import java.util.*
 @Table(
     name = "monthly_transaction_summary",
     indexes = [
-        Index(name = "IDX-MONTHLY-TRANSACTION-MEMBER", columnList = "member_idx"),
-        Index(name = "IDX-MONTHLY-TRANSACTION-YEAR-MONTH", columnList = "year, month")
+        Index(name = "IDX_MONTHLY_TRANSACTION_MEMBER", columnList = "member_idx"),
+        Index(name = "IDX_MONTHLY_TRANSACTION_YEAR_MONTH", columnList = "year, month")
     ]
 )
 class MonthlyTransactionSummary(
@@ -46,17 +46,17 @@ class MonthlyTransactionSummary(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null) return false
-        
+
         val otherSummary = when (other) {
             is HibernateProxy -> (other.hibernateLazyInitializer.implementation as? MonthlyTransactionSummary)
             is MonthlyTransactionSummary -> other
             else -> return false
         } ?: return false
-        
+
         return idx != null && idx == otherSummary.idx
     }
 
     override fun hashCode(): Int = Objects.hash(idx)
 
     override fun toString(): String = "MonthlyTransactionSummary(idx=$idx, year=$year, month=$month, totalAmount=$totalAmount)"
-} 
+}

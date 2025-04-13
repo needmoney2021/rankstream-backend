@@ -12,7 +12,7 @@ import java.util.*
 @Table(
     name = "schedule",
     indexes = [
-        Index(name = "IDX-SCHEDULE-COMPANY-STATE", columnList = "company_idx, state")
+        Index(name = "IDX_SCHEDULE_COMPANY_STATE", columnList = "company_idx, state")
     ]
 )
 class Schedule(
@@ -35,17 +35,17 @@ class Schedule(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null) return false
-        
+
         val otherSchedule = when (other) {
             is HibernateProxy -> (other.hibernateLazyInitializer.implementation as? Schedule)
             is Schedule -> other
             else -> return false
         } ?: return false
-        
+
         return idx != null && idx == otherSchedule.idx
     }
 
     override fun hashCode(): Int = Objects.hash(idx)
 
     override fun toString(): String = "Schedule(idx=$idx, cronExpression='$cronExpression')"
-} 
+}

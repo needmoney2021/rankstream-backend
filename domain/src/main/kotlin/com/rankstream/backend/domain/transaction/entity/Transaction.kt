@@ -11,13 +11,13 @@ import java.util.*
 
 @Entity
 @Table(
-    name = "transaction",
+    name = "`transaction`",
     indexes = [
-        Index(name = "IDX-TRANSACTION-MEMBER", columnList = "member_idx"),
-        Index(name = "IDX-TRANSACTION-ID", columnList = "transaction_id"),
-        Index(name = "IDX-TRANSACTION-STATE", columnList = "state"),
-        Index(name = "IDX-TRANSACTION-ORDERED", columnList = "ordered_at"),
-        Index(name = "IDX-TRANSACTION-CLOSED", columnList = "closed")
+        Index(name = "IDX_TRANSACTION_MEMBER", columnList = "member_idx"),
+        Index(name = "IDX_TRANSACTION_ID", columnList = "transaction_id"),
+        Index(name = "IDX_TRANSACTION_STATE", columnList = "state"),
+        Index(name = "IDX_TRANSACTION_ORDERED", columnList = "ordered_at"),
+        Index(name = "IDX_TRANSACTION_CLOSED", columnList = "closed")
     ]
 )
 class Transaction(
@@ -58,17 +58,17 @@ class Transaction(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null) return false
-        
+
         val otherTransaction = when (other) {
             is HibernateProxy -> (other.hibernateLazyInitializer.implementation as? Transaction)
             is Transaction -> other
             else -> return false
         } ?: return false
-        
+
         return idx != null && idx == otherTransaction.idx
     }
 
     override fun hashCode(): Int = Objects.hash(idx)
 
     override fun toString(): String = "Transaction(idx=$idx, transactionId='$transactionId', amount=$amount)"
-} 
+}

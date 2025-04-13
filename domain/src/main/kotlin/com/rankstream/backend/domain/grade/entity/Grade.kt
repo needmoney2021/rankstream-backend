@@ -11,7 +11,7 @@ import java.util.*
 @Table(
     name = "grade",
     indexes = [
-        Index(name = "IDX-GRADE-COMPANY-CODE", columnList = "company_idx, grade_code")
+        Index(name = "IDX_GRADE_COMPANY_CODE", columnList = "company_idx, grade_code")
     ]
 )
 class Grade(
@@ -39,17 +39,17 @@ class Grade(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null) return false
-        
+
         val otherGrade = when (other) {
             is HibernateProxy -> (other.hibernateLazyInitializer.implementation as? Grade)
             is Grade -> other
             else -> return false
         } ?: return false
-        
+
         return idx != null && idx == otherGrade.idx
     }
 
     override fun hashCode(): Int = Objects.hash(idx)
 
     override fun toString(): String = "Grade(idx=$idx, gradeName='$gradeName')"
-} 
+}
