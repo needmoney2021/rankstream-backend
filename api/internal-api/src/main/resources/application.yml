@@ -16,6 +16,9 @@ cors:
   origins: http://localhost:3000
   methods: "*"
   headers: "*"
+jwt:
+  secret: TestJwtKey
+  issuer: RankStream
 ---
 spring:
   config:

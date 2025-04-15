@@ -5,6 +5,7 @@ import com.rankstream.backend.domain.company.entity.Company
 import com.rankstream.backend.domain.enums.Gender
 import com.rankstream.backend.domain.enums.State
 import com.rankstream.backend.domain.grade.entity.Grade
+import com.rankstream.backend.domain.member.enums.MemberType
 import jakarta.persistence.*
 import jakarta.persistence.Index
 import org.hibernate.proxy.HibernateProxy
@@ -26,6 +27,9 @@ class Member(
     @Column(length = 50, nullable = false)
     val memberId: String,
 
+    @Column(length = 100, nullable = false)
+    val password: String,
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_idx", nullable = false)
     val company: Company,
@@ -43,7 +47,12 @@ class Member(
 
     @Enumerated(EnumType.STRING)
     @Column(length = 15, nullable = false)
-    var state: State
+    var state: State,
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 6, nullable = false)
+    val type: MemberType,
+
 ) : TimestampEntityListener() {
 
     override fun equals(other: Any?): Boolean {

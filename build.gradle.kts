@@ -1,10 +1,10 @@
 plugins {
     kotlin("jvm") version "2.1.20"
-    kotlin("plugin.spring") version "2.1.20"
+    kotlin("plugin.spring") version "2.1.20" apply false
     kotlin("plugin.jpa") version "2.1.20" apply false
-    kotlin("kapt") version "2.1.20"
-    id("org.springframework.boot") version "3.4.4"
-    id("io.spring.dependency-management") version "1.1.7"
+    kotlin("kapt") version "2.1.20" apply false
+    id("org.springframework.boot") version "3.4.4" apply false
+    id("io.spring.dependency-management") version "1.1.7" apply false
 }
 
 java {
@@ -27,13 +27,13 @@ allprojects {
         mavenCentral()
     }
 
-    tasks.withType<Test> {
-        useJUnitPlatform()
-    }
-
 }
 
 subprojects {
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
 
     apply(plugin = "kotlin")
     apply(plugin = "kotlin-spring")
@@ -47,7 +47,6 @@ subprojects {
         implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
         implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
         implementation("org.jetbrains.kotlin:kotlin-reflect")
-        developmentOnly("org.springframework.boot:spring-boot-devtools")
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testImplementation("io.kotest:kotest-runner-junit5-jvm:5.9.1")
         testImplementation("io.kotest:kotest-assertions-core-jvm:5.9.1")

@@ -13,8 +13,13 @@ enum class ErrorCode(
     METHOD_NOT_ALLOWED("허용되지 않은 메소드입니다."),
     UNSUPPORTED_MEDIA_TYPE("지원하지 않는 미디어 타입입니다."),
 
+    // Token Errors
+    TOKEN_EXPIRED("토큰이 만료되었습니다."),
+    AUTHENTICATION_FAILED("인증에 실패하였습니다."),
+
     // Member Errors
     MEMBER_NOT_FOUND("회원을 찾을 수 없습니다."),
+    WRONG_PASSWORD("비밀번호가 잘못되었습니다."),
     MEMBER_ALREADY_EXISTS("이미 존재하는 회원입니다."),
     INVALID_MEMBER_ID("잘못된 회원 ID입니다."),
 
