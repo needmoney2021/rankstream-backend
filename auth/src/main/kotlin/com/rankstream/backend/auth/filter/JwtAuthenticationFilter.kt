@@ -5,7 +5,6 @@ import com.rankstream.backend.auth.service.JwtService
 import com.rankstream.backend.exception.UnauthorizedException
 import com.rankstream.backend.exception.enums.ErrorCode
 import jakarta.servlet.FilterChain
-import jakarta.servlet.RequestDispatcher
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
@@ -44,8 +43,10 @@ class JwtAuthenticationFilter(
             } catch (e: Exception) {
                 log.error("JWT 인증 실패: ${e.message}")
                 SecurityContextHolder.clearContext()
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.message)
-                return
+                if (e is UnauthorizedException) {
+                    throw e
+                }
+                throw UnauthorizedException("인증 실패.", ErrorCode.UNAUTHORIZED)
             }
         }
 

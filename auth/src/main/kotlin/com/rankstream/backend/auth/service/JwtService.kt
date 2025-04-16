@@ -12,6 +12,7 @@ import com.rankstream.backend.exception.ForbiddenException
 import com.rankstream.backend.exception.NotFoundException
 import com.rankstream.backend.exception.UnauthorizedException
 import com.rankstream.backend.exception.enums.ErrorCode
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -32,6 +33,7 @@ class JwtService(
 ) {
 
     companion object {
+        private val log = LoggerFactory.getLogger(JwtService::class.java)
         const val ACCESS_TOKEN_EXPIRE_SECONDS = 1800L // 30분
         const val REFRESH_TOKEN_EXPIRE_SECONDS = 60L * 60 * 24 * 30 // 30일
     }
@@ -67,8 +69,10 @@ class JwtService(
         try {
             return verifier.verify(token)
         } catch (e: TokenExpiredException) {
+            log.error(e.stackTraceToString())
             throw UnauthorizedException("Token expired.", ErrorCode.TOKEN_EXPIRED)
         } catch (e: JWTVerificationException) {
+            log.error(e.stackTraceToString())
             throw UnauthorizedException("Token verification failed.", ErrorCode.AUTHENTICATION_FAILED)
         }
     }
