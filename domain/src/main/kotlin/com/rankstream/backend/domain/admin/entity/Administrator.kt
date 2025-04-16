@@ -21,8 +21,7 @@ import java.util.Objects
 @Table(
     name = "admin",
     indexes = [
-        Index(name = "IDX_ADMINISTRATOR_COMPANY", columnList = "company_idx"),
-        Index(name = "IDX_ADMINISTRATOR_USERID", columnList = "user_id"),
+        Index(name = "UIDX_ADMINISTRATOR_USERID", columnList = "company_idx, user_id"),
         Index(name = "IDX_ADMINISTRATOR_STATE", columnList = "state")
     ]
 )

@@ -38,12 +38,12 @@ class JwtService(
     private val algorithm = Algorithm.HMAC256(secret)
 
     fun generateAccessToken(memberId: String, password: String): String {
-        val member = findMemberOrThrow(memberId)
-        if (!passwordEncoder.matches(password, member.password)) {
+        val administrator = findAdministratorOrThrow(memberId)
+        if (!passwordEncoder.matches(password, administrator.password)) {
             throw UnauthorizedException("Password does not match.", ErrorCode.WRONG_PASSWORD)
         }
 
-        return generateToken(member.idx!!, ACCESS_TOKEN_EXPIRE_SECONDS)
+        return generateToken(administrator.idx!!, ACCESS_TOKEN_EXPIRE_SECONDS)
     }
 
     fun generateRefreshToken(memberIdx: Long): String {
@@ -53,7 +53,7 @@ class JwtService(
     fun generateNewTokensViaRefreshToken(refreshToken: String): List<String> {
         val decoded = decodeToken(refreshToken)
         val memberIdx = decoded.subject
-        val member = findMemberOrThrow(memberIdx.toLong())
+        val member = findAdministratorOrThrow(memberIdx.toLong())
 
         return listOf(generateToken(member.idx!!, ACCESS_TOKEN_EXPIRE_SECONDS), generateToken(member.idx!!, REFRESH_TOKEN_EXPIRE_SECONDS))
     }
@@ -83,7 +83,7 @@ class JwtService(
             .sign(algorithm)
     }
 
-    private fun findMemberOrThrow(memberId: String): Administrator {
+    private fun findAdministratorOrThrow(memberId: String): Administrator {
         val administrator = administratorQueryDslRepository.findByUserId(memberId)
             ?: throw NotFoundException("Member with id: $memberId does not exist", ErrorCode.MEMBER_NOT_FOUND, memberId)
         if (!isActive(administrator)) {
@@ -92,7 +92,7 @@ class JwtService(
         return administrator
     }
 
-    private fun findMemberOrThrow(memberIdx: Long): Administrator {
+    private fun findAdministratorOrThrow(memberIdx: Long): Administrator {
         val administrator = administratorQueryDslRepository.findByIdx(memberIdx)
             ?: throw throw NotFoundException("Member with id: $memberIdx does not exist", ErrorCode.MEMBER_NOT_FOUND, memberIdx)
         if (!isActive(administrator)) {
@@ -104,6 +104,5 @@ class JwtService(
     private fun isActive(administrator: Administrator): Boolean {
         return administrator.state == State.ACTIVE
     }
-
 
 }
