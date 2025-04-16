@@ -8,3 +8,4 @@ val passwordEncoder = BCryptPasswordEncoder()
 fun CompanyRegistrationRequest.withPasswordEncrypt(): CompanyRegistrationRequest {
     return this.copy(password = passwordEncoder.encode(this.password), passwordConfirm = passwordEncoder.encode(this.passwordConfirm))
 }
+

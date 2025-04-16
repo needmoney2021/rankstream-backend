@@ -47,6 +47,7 @@ class SecurityConfig(
                     .requestMatchers(HttpMethod.POST, "/login").permitAll()
                     .requestMatchers(HttpMethod.POST, "/signup").permitAll()
                     .requestMatchers(HttpMethod.GET, "/csrf").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/auth/signin").permitAll()
                     .requestMatchers("/error").permitAll()
                     .requestMatchers(HttpMethod.GET, "/auth/refresh-token").permitAll()
                     .anyRequest().authenticated()

@@ -16,13 +16,28 @@ class AuthService(
 ) {
 
     @Transactional(readOnly = false)
-    fun dropAndSaveRefreshToken(oldToken: String, newToken: String) {
+    fun replaceRefreshToken(oldToken: String, newToken: String) {
         refreshTokenRepository.deleteByRefreshToken(oldToken)
-        refreshTokenRepository.save(RefreshToken(refreshToken = newToken))
+        refreshTokenRepository.save(
+            RefreshToken(refreshToken = newToken)
+        )
+    }
+
+    @Transactional(readOnly = false)
+    fun saveRefreshToken(refreshToken: String) {
+        refreshTokenRepository.save(
+            RefreshToken(refreshToken = refreshToken)
+        )
+    }
+
+    @Transactional(readOnly = false)
+    fun deleteRefreshToken(refreshToken: String) {
+        refreshTokenRepository.deleteByRefreshToken(refreshToken)
     }
 
     fun findRefreshTokenInWhiteList(refreshToken: String): RefreshToken {
         return refreshTokenRepository.findByRefreshToken(refreshToken)
             ?: throw UnauthorizedException("Invalid refresh token.", ErrorCode.AUTHENTICATION_FAILED)
     }
+
 }

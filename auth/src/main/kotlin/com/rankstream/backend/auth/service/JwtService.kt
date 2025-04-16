@@ -13,7 +13,6 @@ import com.rankstream.backend.exception.NotFoundException
 import com.rankstream.backend.exception.UnauthorizedException
 import com.rankstream.backend.exception.enums.ErrorCode
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -28,19 +27,18 @@ class JwtService(
 
     @Value("\${jwt.issuer}")
     private val issuer: String,
+
+    private val passwordEncoder: PasswordEncoder
 ) {
 
-    private val passwordEncoder: PasswordEncoder = BCryptPasswordEncoder()
-
     companion object {
-        private const val ACCESS_TOKEN_EXPIRE_SECONDS = 1800L // 30분
-        private const val REFRESH_TOKEN_EXPIRE_SECONDS = 60L * 60 * 24 * 30 // 30일
+        const val ACCESS_TOKEN_EXPIRE_SECONDS = 1800L // 30분
+        const val REFRESH_TOKEN_EXPIRE_SECONDS = 60L * 60 * 24 * 30 // 30일
     }
 
     private val algorithm = Algorithm.HMAC256(secret)
 
-    fun generateAccessToken(memberId: String, password: String): String {
-        val administrator = findAdministratorOrThrow(memberId)
+    fun generateAccessToken(administrator: Administrator, password: String): String {
         if (!passwordEncoder.matches(password, administrator.password)) {
             throw UnauthorizedException("Password does not match.", ErrorCode.WRONG_PASSWORD)
         }
@@ -48,16 +46,16 @@ class JwtService(
         return generateToken(administrator.idx!!, ACCESS_TOKEN_EXPIRE_SECONDS)
     }
 
-    fun generateRefreshToken(memberIdx: Long): String {
-        return generateToken(memberIdx, REFRESH_TOKEN_EXPIRE_SECONDS)
+    fun generateRefreshToken(administratorIdx: Long): String {
+        return generateToken(administratorIdx, REFRESH_TOKEN_EXPIRE_SECONDS)
     }
 
-    fun generateNewTokensViaRefreshToken(refreshToken: String): List<String> {
+    fun generateNewTokensViaRefreshToken(refreshToken: String): TokenPair {
         val decoded = decodeToken(refreshToken)
         val memberIdx = decoded.subject
         val member = findAdministratorOrThrow(memberIdx.toLong())
 
-        return listOf(generateToken(member.idx!!, ACCESS_TOKEN_EXPIRE_SECONDS), generateToken(member.idx!!, REFRESH_TOKEN_EXPIRE_SECONDS))
+        return TokenPair(generateToken(member.idx!!, ACCESS_TOKEN_EXPIRE_SECONDS), generateToken(member.idx!!, REFRESH_TOKEN_EXPIRE_SECONDS))
     }
 
     fun decodeToken(token: String): DecodedJWT {
@@ -85,15 +83,6 @@ class JwtService(
             .sign(algorithm)
     }
 
-    private fun findAdministratorOrThrow(memberId: String): Administrator {
-        val administrator = administratorQueryDslRepository.findByUserId(memberId)
-            ?: throw NotFoundException("Member with id: $memberId does not exist", ErrorCode.MEMBER_NOT_FOUND, memberId)
-        if (!isActive(administrator)) {
-            throw ForbiddenException("Access denied.", ErrorCode.FORBIDDEN)
-        }
-        return administrator
-    }
-
     private fun findAdministratorOrThrow(memberIdx: Long): Administrator {
         val administrator = administratorQueryDslRepository.findByIdx(memberIdx)
             ?: throw throw NotFoundException("Member with id: $memberIdx does not exist", ErrorCode.MEMBER_NOT_FOUND, memberIdx)
@@ -108,3 +97,5 @@ class JwtService(
     }
 
 }
+
+data class TokenPair(val accessToken: String, val refreshToken: String)

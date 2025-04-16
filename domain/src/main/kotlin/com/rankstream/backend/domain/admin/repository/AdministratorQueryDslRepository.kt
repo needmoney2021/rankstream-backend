@@ -15,12 +15,14 @@ class AdministratorQueryDslRepository(
 
     fun findByUserId(userId: String): Administrator? {
         return jpaQueryFactory.selectFrom(administrator)
+            .join(administrator.company()).fetchJoin()
             .where(administrator.userIdEquals(userId))
             .fetchOne()
     }
 
     fun findByIdx(idx: Long): Administrator? {
         return jpaQueryFactory.selectFrom(administrator)
+            .join(administrator.company()).fetchJoin()
             .where(administrator.idxEquals(idx))
             .fetchOne()
     }
