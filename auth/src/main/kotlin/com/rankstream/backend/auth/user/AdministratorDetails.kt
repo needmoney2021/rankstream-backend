@@ -1,20 +1,20 @@
 package com.rankstream.backend.auth.user
 
-import com.rankstream.backend.domain.member.entity.Member
+import com.rankstream.backend.domain.admin.entity.Administrator
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import com.rankstream.backend.domain.enums.State
 
-class MemberDetails(
-    val member: Member
+class AdministratorDetails(
+    val administrator: Administrator
 ) : UserDetails {
 
-    override fun getUsername(): String = member.memberId
-    override fun getPassword(): String = member.password
+    override fun getUsername(): String = administrator.userId
+    override fun getPassword(): String = administrator.password
     override fun getAuthorities(): Collection<GrantedAuthority> = emptyList()
     override fun isAccountNonExpired(): Boolean = true
     override fun isAccountNonLocked(): Boolean = true
     override fun isCredentialsNonExpired(): Boolean = true
-    override fun isEnabled(): Boolean = member.state == State.ACTIVE
+    override fun isEnabled(): Boolean = administrator.state == State.ACTIVE
 
 }

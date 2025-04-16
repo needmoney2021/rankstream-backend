@@ -1,21 +1,21 @@
 package com.rankstream.backend.auth.service
 
-import com.rankstream.backend.auth.user.MemberDetails
-import com.rankstream.backend.domain.member.repository.MemberQueryDslRepository
+import com.rankstream.backend.auth.user.AdministratorDetails
+import com.rankstream.backend.domain.admin.repository.AdministratorQueryDslRepository
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 
 @Service
-class MemberDetailsService(
-    private val memberQueryDslRepository: MemberQueryDslRepository
+class AdministratorDetailsService(
+    private val administratorQueryDslRepository: AdministratorQueryDslRepository
 ) : UserDetailsService {
 
     override fun loadUserByUsername(username: String): UserDetails? {
-        val member = memberQueryDslRepository.findMemberByIdx(username.toLong())
+        val administrator = administratorQueryDslRepository.findByIdx(username.toLong())
             ?: throw UsernameNotFoundException(username)
-        return MemberDetails(member)
+        return AdministratorDetails(administrator)
     }
 
 }

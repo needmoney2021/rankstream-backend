@@ -2,7 +2,7 @@ package com.rankstream.backend.auth.config
 
 import com.rankstream.backend.auth.filter.JwtAuthenticationFilter
 import com.rankstream.backend.auth.service.JwtService
-import com.rankstream.backend.auth.service.MemberDetailsService
+import com.rankstream.backend.auth.service.AdministratorDetailsService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration
 class SecurityFilterConfig {
 
     @Bean
-    fun jwtAuthenticationFilter(jwtService: JwtService, memberDetailsService: MemberDetailsService): JwtAuthenticationFilter {
-        return JwtAuthenticationFilter(jwtService, memberDetailsService)
+    fun jwtAuthenticationFilter(jwtService: JwtService, administratorDetailsService: AdministratorDetailsService): JwtAuthenticationFilter {
+        return JwtAuthenticationFilter(jwtService, administratorDetailsService)
     }
 }

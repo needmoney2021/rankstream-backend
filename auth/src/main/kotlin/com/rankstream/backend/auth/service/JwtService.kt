@@ -5,9 +5,9 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTVerificationException
 import com.auth0.jwt.exceptions.TokenExpiredException
 import com.auth0.jwt.interfaces.DecodedJWT
-import com.rankstream.backend.domain.member.entity.Member
-import com.rankstream.backend.domain.member.enums.MemberType
-import com.rankstream.backend.domain.member.repository.MemberQueryDslRepository
+import com.rankstream.backend.domain.admin.entity.Administrator
+import com.rankstream.backend.domain.admin.repository.AdministratorQueryDslRepository
+import com.rankstream.backend.domain.enums.State
 import com.rankstream.backend.exception.ForbiddenException
 import com.rankstream.backend.exception.NotFoundException
 import com.rankstream.backend.exception.UnauthorizedException
@@ -20,7 +20,7 @@ import java.time.ZoneId
 
 @Service
 class JwtService(
-    private val memberQueryDslRepository: MemberQueryDslRepository,
+    private val administratorQueryDslRepository: AdministratorQueryDslRepository,
     private val passwordEncoder: PasswordEncoder,
 
     @Value("\${jwt.secret}")
@@ -83,26 +83,26 @@ class JwtService(
             .sign(algorithm)
     }
 
-    private fun findMemberOrThrow(memberId: String): Member {
-        val member = memberQueryDslRepository.findMemberByMemberId(memberId)
+    private fun findMemberOrThrow(memberId: String): Administrator {
+        val administrator = administratorQueryDslRepository.findByUserId(memberId)
             ?: throw NotFoundException("Member with id: $memberId does not exist", ErrorCode.MEMBER_NOT_FOUND, memberId)
-        if (!isAdministrator(member)) {
+        if (!isActive(administrator)) {
             throw ForbiddenException("Access denied.", ErrorCode.FORBIDDEN)
         }
-        return member
+        return administrator
     }
 
-    private fun findMemberOrThrow(memberIdx: Long): Member {
-        val member = memberQueryDslRepository.findMemberByIdx(memberIdx)
+    private fun findMemberOrThrow(memberIdx: Long): Administrator {
+        val administrator = administratorQueryDslRepository.findByIdx(memberIdx)
             ?: throw throw NotFoundException("Member with id: $memberIdx does not exist", ErrorCode.MEMBER_NOT_FOUND, memberIdx)
-        if (!isAdministrator(member)) {
+        if (!isActive(administrator)) {
             throw ForbiddenException("Access denied.", ErrorCode.FORBIDDEN)
         }
-        return member
+        return administrator
     }
 
-    private fun isAdministrator(member: Member): Boolean {
-        return member.type == MemberType.ADMIN
+    private fun isActive(administrator: Administrator): Boolean {
+        return administrator.state == State.ACTIVE
     }
 
 

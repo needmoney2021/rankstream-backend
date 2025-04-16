@@ -1,7 +1,7 @@
 package com.rankstream.backend.auth.filter
 
 import com.rankstream.backend.auth.service.JwtService
-import com.rankstream.backend.auth.service.MemberDetailsService
+import com.rankstream.backend.auth.service.AdministratorDetailsService
 import com.rankstream.backend.exception.UnauthorizedException
 import com.rankstream.backend.exception.enums.ErrorCode
 import jakarta.servlet.FilterChain
@@ -14,7 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 class JwtAuthenticationFilter(
     private val jwtService: JwtService,
-    private val memberDetailsService: MemberDetailsService,
+    private val administratorDetailsService: AdministratorDetailsService,
 ) : OncePerRequestFilter() {
 
     companion object {
@@ -31,7 +31,7 @@ class JwtAuthenticationFilter(
             try {
                 val decoded = jwtService.decodeToken(token)
                 val memberIdx = decoded.subject
-                val userDetails = memberDetailsService.loadUserByUsername(memberIdx)
+                val userDetails = administratorDetailsService.loadUserByUsername(memberIdx)
 
                 val auth = UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails?.authorities
