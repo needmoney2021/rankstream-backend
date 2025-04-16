@@ -4,7 +4,6 @@ import com.rankstream.backend.domain.auditor.TimestampEntityListener
 import com.rankstream.backend.domain.company.entity.Company
 import com.rankstream.backend.domain.enums.State
 import jakarta.persistence.*
-import jakarta.persistence.Index
 import org.hibernate.proxy.HibernateProxy
 import java.util.*
 

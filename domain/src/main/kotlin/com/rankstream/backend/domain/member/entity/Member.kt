@@ -6,7 +6,6 @@ import com.rankstream.backend.domain.enums.Gender
 import com.rankstream.backend.domain.enums.State
 import com.rankstream.backend.domain.grade.entity.Grade
 import jakarta.persistence.*
-import jakarta.persistence.Index
 import org.hibernate.proxy.HibernateProxy
 import java.util.*
 

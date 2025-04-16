@@ -3,11 +3,8 @@ package com.rankstream.backend.auth.service
 import com.rankstream.backend.domain.admin.entity.Administrator
 import com.rankstream.backend.domain.admin.repository.AdministratorQueryDslRepository
 import com.rankstream.backend.domain.company.entity.Company
-import com.rankstream.backend.domain.enums.Gender
 import com.rankstream.backend.domain.enums.State
 import com.rankstream.backend.domain.grade.entity.Grade
-import com.rankstream.backend.domain.member.entity.Member
-import com.rankstream.backend.domain.member.repository.MemberQueryDslRepository
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe

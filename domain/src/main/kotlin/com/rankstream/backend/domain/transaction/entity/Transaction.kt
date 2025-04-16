@@ -4,7 +4,6 @@ import com.rankstream.backend.domain.auditor.TimestampEntityListener
 import com.rankstream.backend.domain.enums.TransactionState
 import com.rankstream.backend.domain.member.entity.Member
 import jakarta.persistence.*
-import jakarta.persistence.Index
 import org.hibernate.proxy.HibernateProxy
 import java.time.LocalDateTime
 import java.util.*

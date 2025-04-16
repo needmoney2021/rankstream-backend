@@ -1,9 +1,9 @@
 package com.rankstream.backend.auth.user
 
 import com.rankstream.backend.domain.admin.entity.Administrator
+import com.rankstream.backend.domain.enums.State
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
-import com.rankstream.backend.domain.enums.State
 
 class AdministratorDetails(
     val administrator: Administrator

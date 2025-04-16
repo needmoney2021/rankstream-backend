@@ -3,7 +3,6 @@ package com.rankstream.backend.domain.transaction.entity
 import com.rankstream.backend.domain.auditor.TimestampEntityListener
 import com.rankstream.backend.domain.member.entity.Member
 import jakarta.persistence.*
-import jakarta.persistence.Index
 import org.hibernate.proxy.HibernateProxy
 import java.util.*
 

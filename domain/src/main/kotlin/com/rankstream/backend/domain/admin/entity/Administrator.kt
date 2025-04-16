@@ -5,19 +5,9 @@ import com.rankstream.backend.domain.company.dto.request.CompanyRegistrationRequ
 import com.rankstream.backend.domain.company.entity.Company
 import com.rankstream.backend.domain.company.enums.BusinessType
 import com.rankstream.backend.domain.enums.State
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.Index
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import org.hibernate.proxy.HibernateProxy
-import java.util.Objects
+import java.util.*
 
 @Entity
 @Table(
