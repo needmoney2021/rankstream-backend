@@ -26,6 +26,7 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
+        log.info("🔥 JwtAuthenticationFilter triggered for path: ${request.servletPath}")
         val token = extractToken(request)
         if (token != null) {
             try {

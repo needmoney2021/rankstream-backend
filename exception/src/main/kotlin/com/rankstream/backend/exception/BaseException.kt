@@ -12,7 +12,7 @@ abstract class BaseException(
 ) : ResponseStatusException(status, message) {
 
     fun getApiError(): ApiError {
-        return ApiError.of(this.errorCode)
+        return ApiError.of(errorCode)
     }
 
 }

@@ -9,8 +9,6 @@ import org.springframework.http.MediaType
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
@@ -20,7 +18,7 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
-    private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+    private val jwtAuthenticationFilter: JwtAuthenticationFilter
 ) {
 
     @Bean
@@ -33,6 +31,7 @@ class SecurityConfig(
         requestHandler.setCsrfRequestAttributeName(CsrfToken::class.java.name)
 
         http
+            .cors {  }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
             .httpBasic { it.disable() }
             .csrf { csrf ->
@@ -46,14 +45,17 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 it
                     .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/signup").permitAll()
                     .requestMatchers(HttpMethod.GET, "/csrf").permitAll()
+                    .requestMatchers("/error").permitAll()
                     .requestMatchers(HttpMethod.GET, "/auth/refresh-token").permitAll()
                     .anyRequest().authenticated()
             }
             .exceptionHandling {
                 it.authenticationEntryPoint { _, response, _ ->
                     response.status = HttpServletResponse.SC_UNAUTHORIZED
-                    response.contentType = MediaType.APPLICATION_JSON_VALUE
+                    response.contentType = "application/json;charset=UTF-8"
+                    response.characterEncoding = "UTF-8"
                     response.writer.write("""
                         {
                             "code": "UNAUTHORIZED",
@@ -66,6 +68,4 @@ class SecurityConfig(
         return http.build()
     }
 
-    @Bean
-    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 }

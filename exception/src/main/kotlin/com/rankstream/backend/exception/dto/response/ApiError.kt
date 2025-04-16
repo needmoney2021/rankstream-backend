@@ -13,12 +13,5 @@ data class ApiError(
                 message = errorCode.message
             )
         }
-
-        fun of(errorCode: ErrorCode, message: String): ApiError {
-            return ApiError(
-                code = errorCode.name,
-                message = message
-            )
-        }
     }
 }

@@ -13,6 +13,7 @@ import com.rankstream.backend.exception.NotFoundException
 import com.rankstream.backend.exception.UnauthorizedException
 import com.rankstream.backend.exception.enums.ErrorCode
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -21,7 +22,6 @@ import java.time.ZoneId
 @Service
 class JwtService(
     private val administratorQueryDslRepository: AdministratorQueryDslRepository,
-    private val passwordEncoder: PasswordEncoder,
 
     @Value("\${jwt.secret}")
     private val secret: String,
@@ -29,6 +29,8 @@ class JwtService(
     @Value("\${jwt.issuer}")
     private val issuer: String,
 ) {
+
+    private val passwordEncoder: PasswordEncoder = BCryptPasswordEncoder()
 
     companion object {
         private const val ACCESS_TOKEN_EXPIRE_SECONDS = 1800L // 30분

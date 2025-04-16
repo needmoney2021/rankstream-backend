@@ -1,7 +1,9 @@
 package com.rankstream.backend.domain.admin.entity
 
 import com.rankstream.backend.domain.auditor.TimestampEntityListener
+import com.rankstream.backend.domain.company.dto.request.CompanyRegistrationRequest
 import com.rankstream.backend.domain.company.entity.Company
+import com.rankstream.backend.domain.company.enums.BusinessType
 import com.rankstream.backend.domain.enums.State
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -51,6 +53,27 @@ class Administrator(
     @Column(length = 20, nullable = false)
     val department: String
 ) : TimestampEntityListener() {
+
+    companion object {
+
+        fun fromCompanyRegistration(companyRegistrationRequest: CompanyRegistrationRequest, company: Company): Administrator {
+            val isCorp = companyRegistrationRequest.businessType == BusinessType.CORPORATION
+            with (companyRegistrationRequest) {
+                return Administrator(
+                    company = company,
+                    userId = email,
+                    password = password,
+                    userName = if (isCorp) {
+                        representative!!
+                    } else {
+                        name!!
+                    },
+                    state = State.ACTIVE,
+                    department = "Supervisor"
+                )
+            }
+        }
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

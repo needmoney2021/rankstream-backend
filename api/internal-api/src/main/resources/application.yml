@@ -13,12 +13,15 @@ spring:
     activate:
       on-profile: local-api
 cors:
-  origins: http://localhost:3000
+  origins: http://localhost:5173,http://localhost:5174
   methods: "*"
   headers: "*"
 jwt:
   secret: TestJwtKey
   issuer: RankStream
+logging:
+  level:
+    org.springframework.security.web.FilterChainProxy: DEBUG
 ---
 spring:
   config:
@@ -33,7 +36,7 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:

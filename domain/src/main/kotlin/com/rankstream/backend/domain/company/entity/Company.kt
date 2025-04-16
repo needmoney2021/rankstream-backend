@@ -1,7 +1,9 @@
 package com.rankstream.backend.domain.company.entity
 
 import com.rankstream.backend.domain.auditor.TimestampEntityListener
-import com.rankstream.backend.domain.enums.Hierarchy
+import com.rankstream.backend.domain.company.dto.request.CompanyRegistrationRequest
+import com.rankstream.backend.domain.company.enums.BusinessType
+import com.rankstream.backend.domain.company.enums.CommissionPlan
 import com.rankstream.backend.domain.enums.State
 import com.rankstream.backend.domain.member.entity.Member
 import jakarta.persistence.*
@@ -14,6 +16,7 @@ import java.util.*
     name = "company",
     indexes = [
         Index(name = "IDX_COMPANY_NAME", columnList = "company_name"),
+        Index(name = "IDX_COMPANY_BUSINESS_TYPE", columnList = "business_type"),
         Index(name = "IDX_COMPANY_STATE", columnList = "state"),
         Index(name = "UIDX_COMPANY_LICENSE", columnList = "business_license", unique = true)
     ]
@@ -32,32 +35,53 @@ class Company(
     @Column(length = 20, nullable = false)
     val companyName: String,
 
+    @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
-    var phone: String,
+    val businessType: BusinessType,
 
-    @Column(length = 50, nullable = false)
-    var email: String,
+    @Column(length = 20, nullable = true)
+    var phone: String?,
 
-    @Column(length = 10, nullable = false)
-    var postalCode: String,
+    @Column(length = 10, nullable = true)
+    var postalCode: String?,
 
-    @Column(length = 100, nullable = false)
-    var address: String,
+    @Column(length = 100, nullable = true)
+    var address: String?,
 
-    @Column(length = 100, nullable = false)
-    var addressDetail: String,
+    @Column(length = 100, nullable = true)
+    var addressDetail: String?,
 
     @Enumerated(EnumType.STRING)
     @Column(length = 15, nullable = false)
     var state: State,
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 10, nullable = false)
-    var hierarchy: Hierarchy,
+    @Column(length = 10, nullable = true)
+    var commissionPlan: CommissionPlan? = null,
 
     @OneToMany(mappedBy = "company", cascade = [CascadeType.ALL], orphanRemoval = true)
     val members: MutableList<Member> = mutableListOf()
 ) : TimestampEntityListener() {
+
+    companion object {
+        fun fromCompanyRegistration(companyRegistrationRequest: CompanyRegistrationRequest): Company {
+            val isCorp = companyRegistrationRequest.businessType == BusinessType.CORPORATION
+            with(companyRegistrationRequest) {
+                return Company(
+                    businessLicense = businessLicense,
+                    representative = if (isCorp) representative!! else name!!,
+                    companyName = if (isCorp) companyName!! else name!!,
+                    businessType = businessType,
+                    phone = if (isCorp) companyPhone!! else phoneNumber!!,
+                    postalCode = if (isCorp) companyPostalCode else postalCode,
+                    address = if (isCorp) companyAddress else address,
+                    addressDetail = if (isCorp) companyAddressDetail else addressDetail,
+                    state = State.ACTIVE
+                )
+            }
+
+        }
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

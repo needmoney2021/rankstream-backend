@@ -23,7 +23,7 @@ class GlobalExceptionHandler {
     fun handleBaseException(e: BaseException): ResponseEntity<ApiError> {
         return ResponseEntity
             .status(e.statusCode)
-            .body(ApiError.of(e.errorCode))
+            .body(e.getApiError())
     }
 
     @ExceptionHandler(NoHandlerFoundException::class)
@@ -66,4 +66,4 @@ class GlobalExceptionHandler {
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(ApiError.of(ErrorCode.UNKNOWN))
     }
-} 
+}

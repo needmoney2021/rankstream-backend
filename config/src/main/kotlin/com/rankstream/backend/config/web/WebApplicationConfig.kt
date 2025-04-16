@@ -59,15 +59,15 @@ class WebApplicationConfig(
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/**")
             .maxAge(3600)
-            .allowedOrigins(this.origins)
-            .allowedMethods(this.methods)
-            .allowedHeaders(this.headers)
+            .allowedOrigins(origins)
+            .allowedMethods(methods)
+            .allowedHeaders(headers)
             .allowCredentials(true)
     }
 
     override fun configureMessageConverters(converters: MutableList<HttpMessageConverter<*>?>) {
-        converters.add(MappingJackson2HttpMessageConverter(this.objectMapper()))
-        converters.add(MappingJackson2XmlHttpMessageConverter(this.xmlMapper()))
+        converters.add(MappingJackson2HttpMessageConverter(objectMapper()))
+        converters.add(MappingJackson2XmlHttpMessageConverter(xmlMapper()))
     }
 
 }

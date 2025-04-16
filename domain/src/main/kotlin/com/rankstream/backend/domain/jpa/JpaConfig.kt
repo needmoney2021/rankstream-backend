@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 
 @Configuration
-@EntityScan(basePackages = ["com.needmoney.pyramidcloud.backend.domain"])
-@EnableJpaRepositories(basePackages = ["com.needmoney.pyramidcloud.backend.domain"])
+@EntityScan(basePackages = ["com.rankstream.backend.domain"])
+@EnableJpaRepositories(basePackages = ["com.rankstream.backend.domain"])
 @EnableJpaAuditing(auditorAwareRef = "entityAuditor")
 class JpaConfig
