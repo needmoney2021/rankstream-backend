@@ -1,5 +1,7 @@
 package com.rankstream.backend.domain.admin.service
 
+import com.rankstream.backend.domain.admin.dto.request.AdministratorSearchRequest
+import com.rankstream.backend.domain.admin.dto.response.AdministratorSearchResponse
 import com.rankstream.backend.domain.admin.entity.Administrator
 import com.rankstream.backend.domain.admin.repository.AdministratorQueryDslRepository
 import com.rankstream.backend.domain.admin.repository.AdministratorRepository
@@ -20,4 +22,7 @@ class AdministratorService(
             ?: throw NotFoundException("Administrator with id $userId not found.", ErrorCode.NOT_FOUND, userId)
     }
 
+    fun findAdministrators(administratorSearchRequest: AdministratorSearchRequest): List<AdministratorSearchResponse> {
+        return administratorQueryDslRepository.findAdministratorsByCondition(administratorSearchRequest)
+    }
 }

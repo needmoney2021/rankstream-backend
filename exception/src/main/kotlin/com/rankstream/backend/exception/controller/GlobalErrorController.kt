@@ -22,6 +22,7 @@ class GlobalErrorController : ErrorController {
             HttpStatus.NOT_FOUND.value() -> ErrorCode.NOT_FOUND
             HttpStatus.METHOD_NOT_ALLOWED.value() -> ErrorCode.METHOD_NOT_ALLOWED
             HttpStatus.UNSUPPORTED_MEDIA_TYPE.value() -> ErrorCode.UNSUPPORTED_MEDIA_TYPE
+            HttpStatus.UNAUTHORIZED.value() -> ErrorCode.UNAUTHORIZED
             else -> ErrorCode.UNKNOWN
         }
 

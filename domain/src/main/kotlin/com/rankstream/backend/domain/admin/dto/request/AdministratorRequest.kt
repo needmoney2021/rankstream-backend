@@ -1,5 +1,6 @@
 package com.rankstream.backend.domain.admin.dto.request
 
+import com.rankstream.backend.domain.enums.State
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
@@ -15,4 +16,11 @@ data class SigninRequest(
 
     @field:NotBlank(message = "Password must not be blank")
     val password: String
+)
+
+data class AdministratorSearchRequest(
+    val name: String?,
+    val id: String?,
+    val state: State?,
+    val companyIdx: Long
 )

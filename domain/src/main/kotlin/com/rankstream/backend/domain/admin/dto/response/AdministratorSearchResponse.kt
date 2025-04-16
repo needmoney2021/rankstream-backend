@@ -1,6 +1,8 @@
 package com.rankstream.backend.domain.admin.dto.response
 
 import com.rankstream.backend.domain.admin.entity.Administrator
+import com.rankstream.backend.domain.enums.State
+import java.time.LocalDateTime
 
 data class SigninResponse(
     val userId: String,
@@ -19,3 +21,15 @@ data class SigninResponse(
         }
     }
 }
+
+data class AdministratorSearchResponse(
+    val companyName: String,
+    val id: String,
+    val name: String,
+    val department: String,
+    val state: State,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime,
+    val createdBy: String,
+    val updatedBy: String
+)
