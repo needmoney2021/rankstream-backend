@@ -5,9 +5,12 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTVerificationException
 import com.auth0.jwt.exceptions.TokenExpiredException
 import com.auth0.jwt.interfaces.DecodedJWT
+import com.rankstream.backend.auth.AuthenticationExpiredException
+import com.rankstream.backend.auth.AuthenticationInvalidException
 import com.rankstream.backend.domain.admin.entity.Administrator
 import com.rankstream.backend.domain.admin.repository.AdministratorQueryDslRepository
 import com.rankstream.backend.domain.enums.State
+import com.rankstream.backend.exception.BadRequestException
 import com.rankstream.backend.exception.ForbiddenException
 import com.rankstream.backend.exception.NotFoundException
 import com.rankstream.backend.exception.UnauthorizedException
@@ -36,14 +39,15 @@ class JwtService(
         private val log = LoggerFactory.getLogger(JwtService::class.java)
         const val ACCESS_TOKEN_EXPIRE_SECONDS = 10L // 30분
 //        const val ACCESS_TOKEN_EXPIRE_SECONDS = 1800L // 30분
-        const val REFRESH_TOKEN_EXPIRE_SECONDS = 60L * 60 * 24 * 30 // 30일
+        const val REFRESH_TOKEN_EXPIRE_SECONDS = 15L// 30일
+//        const val REFRESH_TOKEN_EXPIRE_SECONDS = 60L * 60 * 24 * 30 // 30일
     }
 
     private val algorithm = Algorithm.HMAC256(secret)
 
     fun generateAccessToken(administrator: Administrator, password: String): String {
         if (!passwordEncoder.matches(password, administrator.password)) {
-            throw UnauthorizedException("Password does not match.", ErrorCode.WRONG_PASSWORD)
+            throw BadRequestException("Password does not match.", ErrorCode.WRONG_PASSWORD)
         }
 
         return generateToken(administrator.idx!!, ACCESS_TOKEN_EXPIRE_SECONDS)
@@ -64,17 +68,18 @@ class JwtService(
     fun decodeToken(token: String): DecodedJWT {
         val verifier = JWT.require(algorithm)
             .withIssuer(issuer)
-            .acceptLeeway(60)
+            .acceptLeeway(1)
+//            .acceptLeeway(60)
             .build()
 
         try {
             return verifier.verify(token)
         } catch (e: TokenExpiredException) {
             log.error(e.stackTraceToString())
-            throw UnauthorizedException("Token expired.", ErrorCode.TOKEN_EXPIRED)
+            throw AuthenticationExpiredException()
         } catch (e: JWTVerificationException) {
             log.error(e.stackTraceToString())
-            throw UnauthorizedException("Token verification failed.", ErrorCode.AUTHENTICATION_FAILED)
+            throw AuthenticationInvalidException()
         }
     }
 

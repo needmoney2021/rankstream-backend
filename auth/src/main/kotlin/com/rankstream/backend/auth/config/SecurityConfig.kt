@@ -3,7 +3,6 @@ package com.rankstream.backend.auth.config
 import com.rankstream.backend.auth.entrypoint.ApplicationAuthenticationEntryPoint
 import com.rankstream.backend.auth.filter.JwtAuthenticationFilter
 import com.rankstream.backend.auth.handler.ApplicationAccessDeniedHandler
-import jakarta.servlet.http.HttpServletResponse
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -11,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.access.ExceptionTranslationFilter
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 import org.springframework.security.web.csrf.CsrfToken
@@ -35,7 +35,7 @@ class SecurityConfig(
 
         http
             .cors {  }
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterAfter(jwtAuthenticationFilter, ExceptionTranslationFilter::class.java)
             .httpBasic { it.disable() }
             .csrf { csrf ->
                 csrf

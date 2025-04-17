@@ -21,7 +21,7 @@ jwt:
   issuer: RankStream
 logging:
   level:
-    org.springframework.security.web.FilterChainProxy: DEBUG
+    org.springframework.security.web.FilterChainProxy: TRACE
 ---
 spring:
   config:

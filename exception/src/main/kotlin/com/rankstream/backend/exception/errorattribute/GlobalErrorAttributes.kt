@@ -1,5 +1,6 @@
 package com.rankstream.backend.exception.errorattribute
 
+import com.rankstream.backend.exception.BadRequestException
 import com.rankstream.backend.exception.ForbiddenException
 import com.rankstream.backend.exception.UnauthorizedException
 import com.rankstream.backend.exception.enums.ErrorCode
@@ -24,6 +25,12 @@ class GlobalErrorAttributes : DefaultErrorAttributes() {
             errorAttributes["error"] = HttpStatus.UNAUTHORIZED.reasonPhrase
             errorAttributes["message"] = ErrorCode.AUTHENTICATION_FAILED.message
             errorAttributes["code"] = ErrorCode.AUTHENTICATION_FAILED.name
+        } else if (throwable is BadRequestException) {
+            val errorCode = throwable.errorCode
+            errorAttributes["status"] = 400
+            errorAttributes["error"] = HttpStatus.UNAUTHORIZED.reasonPhrase
+            errorAttributes["message"] = errorCode.message
+            errorAttributes["code"] = errorCode.name
         } else {
             errorAttributes["status"] = 500
             errorAttributes["error"] = HttpStatus.INTERNAL_SERVER_ERROR.reasonPhrase
