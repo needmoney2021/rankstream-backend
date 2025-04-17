@@ -25,4 +25,10 @@ class AdministratorService(
     fun findAdministrators(administratorSearchRequest: AdministratorSearchRequest): List<AdministratorSearchResponse> {
         return administratorQueryDslRepository.findAdministratorsByCondition(administratorSearchRequest)
     }
+
+    fun findByCompanyAndUserId(companyIdx: Long, userId: String): AdministratorSearchResponse {
+        return administratorQueryDslRepository.findByCompanyAndUserId(companyIdx, userId)
+            ?: throw NotFoundException("Administrator with id $userId and company $companyIdx not found.", ErrorCode.NOT_FOUND, listOf(userId, companyIdx.toString()))
+    }
+
 }

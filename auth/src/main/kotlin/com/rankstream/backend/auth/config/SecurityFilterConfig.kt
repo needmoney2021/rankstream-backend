@@ -13,4 +13,5 @@ class SecurityFilterConfig {
     fun jwtAuthenticationFilter(jwtService: JwtService, administratorDetailsService: AdministratorDetailsService): JwtAuthenticationFilter {
         return JwtAuthenticationFilter(jwtService, administratorDetailsService)
     }
+
 }

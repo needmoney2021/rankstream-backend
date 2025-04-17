@@ -8,6 +8,7 @@ import com.rankstream.backend.domain.enums.State
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -27,5 +28,13 @@ class AdministratorController(
     ): ResponseEntity<List<AdministratorSearchResponse>> {
         val administratorSearchRequest = AdministratorSearchRequest(name, id, state, administratorDetails.administrator.company.idx!!)
         return ResponseEntity.ok(administratorService.findAdministrators(administratorSearchRequest))
+    }
+
+    @GetMapping("/{user-id}")
+    fun findAdministratorDetails(
+        @AuthenticationPrincipal administratorDetails: AdministratorDetails,
+        @PathVariable("user-id") userId: String
+    ): ResponseEntity<AdministratorSearchResponse> {
+        return ResponseEntity.ok(administratorService.findByCompanyAndUserId(administratorDetails.administrator.company.idx!!, userId))
     }
 }

@@ -1,6 +1,8 @@
 package com.rankstream.backend.auth.config
 
+import com.rankstream.backend.auth.entrypoint.ApplicationAuthenticationEntryPoint
 import com.rankstream.backend.auth.filter.JwtAuthenticationFilter
+import com.rankstream.backend.auth.handler.ApplicationAccessDeniedHandler
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -17,7 +19,9 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
-    private val jwtAuthenticationFilter: JwtAuthenticationFilter
+    private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+    private val applicationAuthenticationEntryPoint: ApplicationAuthenticationEntryPoint,
+    private val applicationAccessDeniedHandler: ApplicationAccessDeniedHandler
 ) {
 
     @Bean
@@ -52,17 +56,8 @@ class SecurityConfig(
                     .anyRequest().authenticated()
             }
             .exceptionHandling {
-                it.authenticationEntryPoint { _, response, _ ->
-                    response.status = HttpServletResponse.SC_UNAUTHORIZED
-                    response.contentType = "application/json;charset=UTF-8"
-                    response.characterEncoding = "UTF-8"
-                    response.writer.write("""
-                        {
-                            "code": "UNAUTHORIZED",
-                            "message": "인증이 필요합니다."
-                        }
-                    """.trimIndent())
-                }
+                it.authenticationEntryPoint(applicationAuthenticationEntryPoint)
+                    .accessDeniedHandler(applicationAccessDeniedHandler)
             }
 
         return http.build()

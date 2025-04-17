@@ -55,10 +55,35 @@ class AdministratorQueryDslRepository(
             )
             .fetch()
     }
+
+    fun findByCompanyAndUserId(companyIdx: Long, userId: String): AdministratorSearchResponse? {
+        return jpaQueryFactory.select(
+            Projections.constructor<AdministratorSearchResponse>(
+                AdministratorSearchResponse::class.java,
+                administrator.company().companyName,
+                administrator.userId,
+                administrator.userName,
+                administrator.department,
+                administrator.state,
+                administrator.createdAt,
+                administrator.updatedAt,
+                administrator.createdBy,
+                administrator.updatedBy
+            )
+        ).from(administrator)
+            .join(administrator.company())
+            .where(
+                administrator.companyIdxEquals(companyIdx),
+                administrator.userIdEquals(userId)
+            )
+            .fetchOne()
+    }
 }
 
 fun QAdministrator.userIdEquals(userId: String?): BooleanExpression? = userId?.let { this.userId.eq(it) }
 fun QAdministrator.idxEquals(idx: Long?): BooleanExpression? = idx?.let { this.idx.eq(it) }
 fun QAdministrator.companyIdxEquals(idx: Long?): BooleanExpression? = idx?.let { this.company().idx.eq(it) }
-fun QAdministrator.userNameContains(userName: String?): BooleanExpression? = userName?.let { this.userName.containsIgnoreCase(it) }
+fun QAdministrator.userNameContains(userName: String?): BooleanExpression? =
+    userName?.let { this.userName.containsIgnoreCase(it) }
+
 fun QAdministrator.stateEquals(state: State?): BooleanExpression? = state?.let { this.state.eq(it) }

@@ -8,28 +8,29 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
+import org.springframework.core.Ordered
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.filter.OncePerRequestFilter
+import java.util.*
+
 
 class JwtAuthenticationFilter(
     private val jwtService: JwtService,
-    private val administratorDetailsService: AdministratorDetailsService,
+    private val administratorDetailsService: AdministratorDetailsService
 ) : OncePerRequestFilter() {
-
-    companion object {
-        private val log = LoggerFactory.getLogger(JwtAuthenticationFilter::class.java)
-    }
 
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        log.info("🔥 JwtAuthenticationFilter triggered for path: ${request.servletPath}")
         val token = extractToken(request)
-        if (token != null) {
-            try {
+
+        try {
+            if (token != null) {
                 val decoded = jwtService.decodeToken(token)
                 val memberIdx = decoded.subject
                 val userDetails = administratorDetailsService.loadUserByUsername(memberIdx)
@@ -37,17 +38,14 @@ class JwtAuthenticationFilter(
                 val auth = UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails?.authorities
                 )
-
                 SecurityContextHolder.getContext().authentication = auth
                 request.setAttribute("user-id", memberIdx)
-            } catch (e: Exception) {
-                log.error("JWT 인증 실패: ${e.message}")
-                SecurityContextHolder.clearContext()
-                if (e is UnauthorizedException) {
-                    throw e
-                }
-                throw UnauthorizedException("인증 실패.", ErrorCode.UNAUTHORIZED)
             }
+        } catch (ex: Exception) {
+            // 중요: SecurityContext 비우고, 예외 위임
+            SecurityContextHolder.clearContext()
+            // TODO AuthenticationException으로
+            throw ex
         }
 
         filterChain.doFilter(request, response)

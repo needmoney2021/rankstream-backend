@@ -15,7 +15,8 @@ import java.util.*
     indexes = [
         Index(name = "UIDX_ADMINISTRATOR_USERID", columnList = "company_idx, user_id"),
         Index(name = "IDX_ADMINISTRATOR_STATE", columnList = "state"),
-        Index(name = "IDX_ADMINISTRATOR_NAME", columnList = "user_name")
+        Index(name = "IDX_ADMINISTRATOR_NAME", columnList = "user_name"),
+        Index(name = "IDX_ADMINISTRATOR_USERID", columnList = "user_id")
     ]
 )
 class Administrator(

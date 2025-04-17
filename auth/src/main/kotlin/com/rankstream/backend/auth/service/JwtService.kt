@@ -34,7 +34,8 @@ class JwtService(
 
     companion object {
         private val log = LoggerFactory.getLogger(JwtService::class.java)
-        const val ACCESS_TOKEN_EXPIRE_SECONDS = 1800L // 30분
+        const val ACCESS_TOKEN_EXPIRE_SECONDS = 10L // 30분
+//        const val ACCESS_TOKEN_EXPIRE_SECONDS = 1800L // 30분
         const val REFRESH_TOKEN_EXPIRE_SECONDS = 60L * 60 * 24 * 30 // 30일
     }
 
