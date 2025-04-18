@@ -27,8 +27,8 @@ class SignupService(
     @Transactional(readOnly = false)
     fun signup(companyRegistrationRequest: CompanyRegistrationRequest): CompanyRegistrationResponse {
         log.info("Received company registration request: {}", companyRegistrationRequest)
-        val exists = companyQueryDslRepository.findByBusinessLicense(companyRegistrationRequest.businessLicense)
-        if (exists != null) {
+        val exists = companyRepository.existsByBusinessLicense(companyRegistrationRequest.businessLicense)
+        if (exists) {
             throw DuplicatedException("Company with business license ${companyRegistrationRequest.businessLicense} already exists.")
         }
         val company = companyRepository.save(Company.fromCompanyRegistration(companyRegistrationRequest))

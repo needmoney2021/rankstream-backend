@@ -2,6 +2,7 @@ package com.rankstream.backend.domain.grade.entity
 
 import com.rankstream.backend.domain.auditor.TimestampEntityListener
 import com.rankstream.backend.domain.company.entity.Company
+import com.rankstream.backend.domain.grade.dto.request.GradeRegistrationRequest
 import jakarta.persistence.*
 import org.hibernate.proxy.HibernateProxy
 import java.util.*
@@ -10,7 +11,7 @@ import java.util.*
 @Table(
     name = "grade",
     indexes = [
-        Index(name = "IDX_GRADE_COMPANY_CODE", columnList = "company_idx, grade_code")
+        Index(name = "IDX_GRADE_COMPANY", columnList = "company_idx")
     ]
 )
 class Grade(
@@ -22,18 +23,26 @@ class Grade(
     @JoinColumn(name = "company_idx", nullable = false)
     val company: Company,
 
-    @Column(length = 10, nullable = false)
-    val gradeCode: String,
-
     @Column(length = 20, nullable = false)
-    val gradeName: String,
+    var gradeName: String,
 
     @Column(nullable = false)
-    var requiredPoint: Int,
+    var requiredPoint: Double,
 
     @Column(nullable = false)
     var paybackRatio: Double
 ) : TimestampEntityListener() {
+
+    companion object {
+        fun create(request: GradeRegistrationRequest, company: Company): Grade {
+            return Grade(
+                company = company,
+                gradeName = request.name,
+                requiredPoint = request.achievementPoint,
+                paybackRatio = request.refundRate
+            )
+        }
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

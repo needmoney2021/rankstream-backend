@@ -51,6 +51,7 @@ class JwtAuthenticationFilter(
 
                     SecurityContextHolder.getContext().authentication = auth
                     request.setAttribute("user-id", memberIdx)
+                    request.setAttribute("user-name", userDetails.username)
                 } catch (e: Exception) {
                     SecurityContextHolder.clearContext()
                     lateinit var errorCode: ErrorCode

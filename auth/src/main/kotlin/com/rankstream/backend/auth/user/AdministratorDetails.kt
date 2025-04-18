@@ -9,7 +9,7 @@ class AdministratorDetails(
     val administrator: Administrator
 ) : UserDetails {
 
-    override fun getUsername(): String = administrator.userId
+    override fun getUsername(): String = administrator.userName
     override fun getPassword(): String = administrator.password
     override fun getAuthorities(): Collection<GrantedAuthority> = emptyList()
     override fun isAccountNonExpired(): Boolean = true

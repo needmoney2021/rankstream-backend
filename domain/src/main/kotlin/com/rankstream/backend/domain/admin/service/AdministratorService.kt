@@ -8,6 +8,7 @@ import com.rankstream.backend.domain.admin.entity.Administrator
 import com.rankstream.backend.domain.admin.repository.AdministratorQueryDslRepository
 import com.rankstream.backend.domain.admin.repository.AdministratorRepository
 import com.rankstream.backend.domain.company.repository.CompanyQueryDslRepository
+import com.rankstream.backend.domain.company.repository.CompanyRepository
 import com.rankstream.backend.exception.DuplicatedException
 import com.rankstream.backend.exception.ForbiddenException
 import com.rankstream.backend.exception.NotFoundException
@@ -20,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 class AdministratorService(
     private val administratorRepository: AdministratorRepository,
     private val administratorQueryDslRepository: AdministratorQueryDslRepository,
-    private val companyQueryDslRepository: CompanyQueryDslRepository
+    private val companyRepository: CompanyRepository
 ) {
 
     fun findByUserId(userId: String): Administrator {
@@ -39,6 +40,7 @@ class AdministratorService(
 
     @Transactional(readOnly = false)
     fun updateAdministrator(administratorUpdateRequestWithPasswordEncoded: AdministratorUpdateCommand, idx: Long, companyIdx: Long): AdministratorResponse {
+        // FIXME 엔티티 조회가 필요한 부분은 JpaRepository로
         val administrator = administratorQueryDslRepository.findByIdx(idx)
             ?: throw NotFoundException("Administrator with id $idx not found.", ErrorCode.NOT_FOUND, idx)
         if (administrator.company.idx != companyIdx) {
@@ -61,13 +63,12 @@ class AdministratorService(
             }
         }
 
-        administratorRepository.save(administrator)
         return AdministratorResponse.fromEntity(administrator)
     }
 
     @Transactional(readOnly = false)
     fun registerAdministrator(administratorRegistrationRequestWithPasswordEncoded: AdministratorRegistrationCommand, companyIdx: Long): AdministratorResponse {
-        val company = companyQueryDslRepository.findByIdx(companyIdx)
+        val company = companyRepository.findByIdx(companyIdx)
             ?: throw NotFoundException("Company with id $companyIdx not found.", ErrorCode.NOT_FOUND, companyIdx)
 
         val exists = administratorRepository.existsByCompanyAndUserId(company, administratorRegistrationRequestWithPasswordEncoded.id)

@@ -19,11 +19,11 @@ class TimestampEntityListener {
     var createdAt: LocalDateTime = LocalDateTime.MIN
 
     @LastModifiedDate
-    @Column(name = "updated_at", nullable = false, updatable = false)
+    @Column(name = "updated_at", nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.MIN
 
     @CreatedBy
-    @Column(name = "created_by", nullable = false)
+    @Column(name = "created_by", nullable = false, updatable = false)
     lateinit var createdBy: String
 
     @LastModifiedBy

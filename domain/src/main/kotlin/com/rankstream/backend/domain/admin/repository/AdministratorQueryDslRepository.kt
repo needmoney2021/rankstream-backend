@@ -17,6 +17,10 @@ class AdministratorQueryDslRepository(
 
     private val administrator = QAdministrator.administrator
 
+    // Entity 자체를 리턴하는 함수는 JpaRepository 확장 인터페이스에 선언하는 것을 원칙으로 함.
+    // 그러나 아래 두 함수는 auth 모듈에서 참조하는데
+    // auth 모듈에서는 Jpa에 대한 의존이 없어 JpaRepository 확장 인터페이스 접근이 불가함.
+    // 따라서 불가피하게 여기에 작성하였음.
     fun findByUserId(userId: String): Administrator? {
         return jpaQueryFactory.selectFrom(administrator)
             .join(administrator.company()).fetchJoin()

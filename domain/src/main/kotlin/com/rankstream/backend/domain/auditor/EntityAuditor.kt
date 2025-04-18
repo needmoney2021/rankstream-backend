@@ -17,8 +17,8 @@ class EntityAuditor(
 
     override fun getCurrentAuditor(): Optional<String> {
         return try {
-            val userId = httpServletRequest.getAttribute("user-id") as? String
-            Optional.of(userId ?: resolveSystemAuditor())
+            val userName = httpServletRequest.getAttribute("user-name") as? String
+            Optional.of(userName ?: resolveSystemAuditor())
         } catch (e: Exception) {
             log.warn("Failed to resolve current auditor: ${e.message}")
             Optional.of(resolveSystemAuditor())
