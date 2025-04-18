@@ -3,7 +3,6 @@ package com.rankstream.backend.exception.controller
 import com.rankstream.backend.exception.UnauthorizedException
 import com.rankstream.backend.exception.dto.response.ApiError
 import com.rankstream.backend.exception.enums.ErrorCode
-import jakarta.servlet.RequestDispatcher
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.boot.web.servlet.error.ErrorAttributes
 import org.springframework.boot.web.servlet.error.ErrorController

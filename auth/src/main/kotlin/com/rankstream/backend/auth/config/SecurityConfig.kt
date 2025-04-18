@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.access.ExceptionTranslationFilter
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 import org.springframework.security.web.csrf.CsrfToken
@@ -25,7 +24,7 @@ class SecurityConfig(
 ) {
 
     @Bean
-    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+    fun filterChain(http: HttpSecurity): SecurityFilterChain {
         val tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse()
         tokenRepository.cookiePath = "/"
         tokenRepository.setCookieName("XSRF-TOKEN")
@@ -35,7 +34,6 @@ class SecurityConfig(
 
         http
             .cors {  }
-            .addFilterAfter(jwtAuthenticationFilter, ExceptionTranslationFilter::class.java)
             .httpBasic { it.disable() }
             .csrf { csrf ->
                 csrf
@@ -59,6 +57,8 @@ class SecurityConfig(
                 it.authenticationEntryPoint(applicationAuthenticationEntryPoint)
                     .accessDeniedHandler(applicationAccessDeniedHandler)
             }
+
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
     }

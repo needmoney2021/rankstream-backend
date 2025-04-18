@@ -13,7 +13,6 @@ import com.rankstream.backend.domain.enums.State
 import com.rankstream.backend.exception.BadRequestException
 import com.rankstream.backend.exception.ForbiddenException
 import com.rankstream.backend.exception.NotFoundException
-import com.rankstream.backend.exception.UnauthorizedException
 import com.rankstream.backend.exception.enums.ErrorCode
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -37,9 +36,9 @@ class JwtService(
 
     companion object {
         private val log = LoggerFactory.getLogger(JwtService::class.java)
-        const val ACCESS_TOKEN_EXPIRE_SECONDS = 10L // 30분
+        const val ACCESS_TOKEN_EXPIRE_SECONDS = 5L // 30분
 //        const val ACCESS_TOKEN_EXPIRE_SECONDS = 1800L // 30분
-        const val REFRESH_TOKEN_EXPIRE_SECONDS = 15L// 30일
+        const val REFRESH_TOKEN_EXPIRE_SECONDS = 10L // 30일
 //        const val REFRESH_TOKEN_EXPIRE_SECONDS = 60L * 60 * 24 * 30 // 30일
     }
 
@@ -76,10 +75,10 @@ class JwtService(
             return verifier.verify(token)
         } catch (e: TokenExpiredException) {
             log.error(e.stackTraceToString())
-            throw AuthenticationExpiredException()
+            throw AuthenticationExpiredException(throwable = e)
         } catch (e: JWTVerificationException) {
             log.error(e.stackTraceToString())
-            throw AuthenticationInvalidException()
+            throw AuthenticationInvalidException(throwable = e)
         }
     }
 
@@ -95,7 +94,7 @@ class JwtService(
 
     private fun findAdministratorOrThrow(memberIdx: Long): Administrator {
         val administrator = administratorQueryDslRepository.findByIdx(memberIdx)
-            ?: throw throw NotFoundException("Member with id: $memberIdx does not exist", ErrorCode.MEMBER_NOT_FOUND, memberIdx)
+            ?: throw throw NotFoundException("Member with id: $memberIdx does not exist", ErrorCode.USER_NOT_FOUND, memberIdx)
         if (!isActive(administrator)) {
             throw ForbiddenException("Access denied.", ErrorCode.FORBIDDEN)
         }

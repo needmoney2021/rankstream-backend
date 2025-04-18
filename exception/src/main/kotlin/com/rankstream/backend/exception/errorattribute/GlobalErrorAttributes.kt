@@ -1,7 +1,6 @@
 package com.rankstream.backend.exception.errorattribute
 
 import com.rankstream.backend.exception.BadRequestException
-import com.rankstream.backend.exception.ForbiddenException
 import com.rankstream.backend.exception.UnauthorizedException
 import com.rankstream.backend.exception.enums.ErrorCode
 import org.springframework.boot.web.error.ErrorAttributeOptions
