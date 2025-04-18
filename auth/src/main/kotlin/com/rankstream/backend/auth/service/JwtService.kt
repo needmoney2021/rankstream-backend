@@ -36,10 +36,8 @@ class JwtService(
 
     companion object {
         private val log = LoggerFactory.getLogger(JwtService::class.java)
-        const val ACCESS_TOKEN_EXPIRE_SECONDS = 5L // 30분
-//        const val ACCESS_TOKEN_EXPIRE_SECONDS = 1800L // 30분
-        const val REFRESH_TOKEN_EXPIRE_SECONDS = 10L // 30일
-//        const val REFRESH_TOKEN_EXPIRE_SECONDS = 60L * 60 * 24 * 30 // 30일
+        const val ACCESS_TOKEN_EXPIRE_SECONDS = 1800L // 30분
+        const val REFRESH_TOKEN_EXPIRE_SECONDS = 60L * 60 * 24 * 30 // 30일
     }
 
     private val algorithm = Algorithm.HMAC256(secret)
@@ -67,8 +65,7 @@ class JwtService(
     fun decodeToken(token: String): DecodedJWT {
         val verifier = JWT.require(algorithm)
             .withIssuer(issuer)
-            .acceptLeeway(1)
-//            .acceptLeeway(60)
+            .acceptLeeway(60)
             .build()
 
         try {
