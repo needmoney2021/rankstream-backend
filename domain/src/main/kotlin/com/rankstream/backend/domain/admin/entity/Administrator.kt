@@ -1,5 +1,6 @@
 package com.rankstream.backend.domain.admin.entity
 
+import com.rankstream.backend.domain.admin.dto.request.AdministratorRegistrationCommand
 import com.rankstream.backend.domain.auditor.TimestampEntityListener
 import com.rankstream.backend.domain.company.dto.request.CompanyRegistrationRequest
 import com.rankstream.backend.domain.company.entity.Company
@@ -13,6 +14,7 @@ import java.util.*
 @Table(
     name = "admin",
     indexes = [
+        Index(name = "IDX_ADMINISTRATOR_COMPANY", columnList = "company_idx"),
         Index(name = "UIDX_ADMINISTRATOR_USERID", columnList = "company_idx, user_id"),
         Index(name = "IDX_ADMINISTRATOR_STATE", columnList = "state"),
         Index(name = "IDX_ADMINISTRATOR_NAME", columnList = "user_name"),
@@ -33,20 +35,31 @@ class Administrator(
     val userId: String,
 
     @Column(length = 100, nullable = false)
-    val password: String,
+    var password: String,
 
     @Column(length = 10, nullable = false)
     val userName: String,
 
     @Enumerated(EnumType.STRING)
     @Column(length = 15, nullable = false)
-    val state: State,
+    var state: State,
 
     @Column(length = 20, nullable = false)
-    val department: String
+    var department: String
 ) : TimestampEntityListener() {
 
     companion object {
+
+        fun create(command: AdministratorRegistrationCommand, company: Company): Administrator {
+            return Administrator(
+                company = company,
+                userId = command.id,
+                password = command.encodedPassword,
+                userName = command.name,
+                department = command.department,
+                state = State.ACTIVE
+            )
+        }
 
         fun fromCompanyRegistration(companyRegistrationRequest: CompanyRegistrationRequest, company: Company): Administrator {
             val isCorp = companyRegistrationRequest.businessType == BusinessType.CORPORATION

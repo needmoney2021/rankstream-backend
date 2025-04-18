@@ -4,7 +4,7 @@ import com.querydsl.core.types.Projections
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.rankstream.backend.domain.admin.dto.request.AdministratorSearchRequest
-import com.rankstream.backend.domain.admin.dto.response.AdministratorSearchResponse
+import com.rankstream.backend.domain.admin.dto.response.AdministratorResponse
 import com.rankstream.backend.domain.admin.entity.Administrator
 import com.rankstream.backend.domain.admin.entity.QAdministrator
 import com.rankstream.backend.domain.enums.State
@@ -31,10 +31,11 @@ class AdministratorQueryDslRepository(
             .fetchOne()
     }
 
-    fun findAdministratorsByCondition(administratorSearchRequest: AdministratorSearchRequest): List<AdministratorSearchResponse> {
+    fun findAdministratorsByCondition(administratorSearchRequest: AdministratorSearchRequest): List<AdministratorResponse> {
         return jpaQueryFactory.select(
-            Projections.constructor<AdministratorSearchResponse>(
-                AdministratorSearchResponse::class.java,
+            Projections.constructor<AdministratorResponse>(
+                AdministratorResponse::class.java,
+                administrator.idx,
                 administrator.company().companyName,
                 administrator.userId,
                 administrator.userName,
@@ -56,10 +57,11 @@ class AdministratorQueryDslRepository(
             .fetch()
     }
 
-    fun findByCompanyAndUserId(companyIdx: Long, userId: String): AdministratorSearchResponse? {
+    fun findByCompanyAndIdx(companyIdx: Long, idx: Long): AdministratorResponse? {
         return jpaQueryFactory.select(
-            Projections.constructor<AdministratorSearchResponse>(
-                AdministratorSearchResponse::class.java,
+            Projections.constructor<AdministratorResponse>(
+                AdministratorResponse::class.java,
+                administrator.idx,
                 administrator.company().companyName,
                 administrator.userId,
                 administrator.userName,
@@ -73,8 +75,8 @@ class AdministratorQueryDslRepository(
         ).from(administrator)
             .join(administrator.company())
             .where(
-                administrator.companyIdxEquals(companyIdx),
-                administrator.userIdEquals(userId)
+                administrator.idxEquals(idx),
+                administrator.companyIdxEquals(companyIdx)
             )
             .fetchOne()
     }

@@ -13,6 +13,10 @@ class CompanyQueryDslRepository(
 
     fun findByBusinessLicense(businessLicense: String) =
         jpaQueryFactory.selectFrom(company).where(company.businessLicense.eq(businessLicense)).fetchOne()
+
+    fun findByIdx(idx: Long) =
+        jpaQueryFactory.selectFrom(company).where(company.idxEquals(idx)).fetchOne()
 }
 
 fun QCompany.businessLicenseEquals(businessLicense: String?) = businessLicense?.let { this.businessLicense.eq(it) }
+fun QCompany.idxEquals(idx: Long?) = idx?.let { this.idx.eq(it) }

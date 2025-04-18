@@ -22,7 +22,8 @@ data class SigninResponse(
     }
 }
 
-data class AdministratorSearchResponse(
+data class AdministratorResponse(
+    val idx: Long,
     val companyName: String,
     val id: String,
     val name: String,
@@ -32,4 +33,23 @@ data class AdministratorSearchResponse(
     val updatedAt: LocalDateTime,
     val createdBy: String,
     val updatedBy: String
-)
+) {
+    companion object {
+        fun fromEntity(administrator: Administrator): AdministratorResponse {
+            with (administrator) {
+                return AdministratorResponse(
+                    idx = idx!!,
+                    companyName = company.companyName,
+                    id = userId,
+                    name = userName,
+                    department = department,
+                    state = state,
+                    createdAt = createdAt,
+                    updatedAt = updatedAt,
+                    createdBy = createdBy,
+                    updatedBy = updatedBy,
+                )
+            }
+        }
+    }
+}
