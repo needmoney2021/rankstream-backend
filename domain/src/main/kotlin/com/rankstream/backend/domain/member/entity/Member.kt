@@ -13,9 +13,16 @@ import java.util.*
 @Table(
     name = "member",
     indexes = [
-        Index(name = "IDX_MEMBER_STATE_COMPANY", columnList = "state, company_idx"),
-        Index(name = "UIDX_MEMBER_ID_COMPANY", columnList = "member_id, company_idx", unique = true),
-        Index(name = "IDX_MEMBER_COMPANY", columnList = "company_idx")
+        // 기본 검색 필터 최적화 (company_idx는 항상 맨 앞!)
+        Index(name = "IDX_MEMBER_COMPANY_ID", columnList = "company_idx, member_id"),
+        Index(name = "IDX_MEMBER_COMPANY_NAME", columnList = "company_idx, member_name"),
+        Index(name = "IDX_MEMBER_COMPANY_GENDER", columnList = "company_idx, gender"),
+
+        // 정렬 성능 최적화
+        Index(name = "IDX_MEMBER_COMPANY_CREATED_AT", columnList = "company_idx, created_at"),
+
+        // 유니크 제약
+        Index(name = "UIDX_MEMBER_ID_COMPANY", columnList = "member_id, company_idx", unique = true)
     ]
 )
 class Member(
@@ -37,7 +44,7 @@ class Member(
     @Column(length = 6, nullable = false)
     val gender: Gender,
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grade_idx")
     var grade: Grade,
 

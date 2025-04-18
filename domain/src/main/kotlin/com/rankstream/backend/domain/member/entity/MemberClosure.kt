@@ -9,10 +9,11 @@ import java.util.*
 @Table(
     name = "member_closure",
     indexes = [
-        Index(name = "IDX_MEMBER_CLOSURE_ANC_DESC", columnList = "ancestor_idx, descendant_idx"),
-        Index(name = "IDX_MEMBER_CLOSURE_ANCESTOR", columnList = "ancestor_idx"),
-        Index(name = "IDX_MEMBER_CLOSURE_DESCENDANT", columnList = "descendant_idx"),
-        Index(name = "IDX_MEMBER_CLOSURE_DEPTH", columnList = "depth")
+        Index(name = "IDX_CLOSURE_ANCESTOR_DEPTH", columnList = "ancestor_idx, depth"),
+        Index(name = "IDX_CLOSURE_DESCENDANT_DEPTH", columnList = "descendant_idx, depth"),
+
+        Index(name = "IDX_CLOSURE_ANCESTOR", columnList = "ancestor_idx"),
+        Index(name = "IDX_CLOSURE_DESCENDANT", columnList = "descendant_idx")
     ]
 )
 class MemberClosure(

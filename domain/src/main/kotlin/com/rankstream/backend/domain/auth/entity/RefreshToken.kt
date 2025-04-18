@@ -6,9 +6,9 @@ import org.hibernate.proxy.HibernateProxy
 
 @Entity
 @Table(
-    name = "member_auth",
+    name = "refresh_token",
     indexes = [
-        Index(name = "UIDX_AUTH_REFRESH_TOKEN", columnList = "refresh_token", unique = true),
+        Index(name = "UIDX_REFRESH_TOKEN", columnList = "refresh_token", unique = true),
     ]
 )
 class RefreshToken(
