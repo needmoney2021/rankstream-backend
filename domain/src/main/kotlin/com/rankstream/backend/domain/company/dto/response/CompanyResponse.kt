@@ -2,6 +2,7 @@ package com.rankstream.backend.domain.company.dto.response
 
 import com.rankstream.backend.domain.admin.entity.Administrator
 import com.rankstream.backend.domain.company.entity.Company
+import com.rankstream.backend.domain.company.enums.CommissionPlan
 
 data class CompanyRegistrationResponse(
     val companyIndex: Long,
@@ -20,3 +21,7 @@ data class CompanyRegistrationResponse(
         }
     }
 }
+
+data class CompanyCommissionResponse(
+    val commissionPlan: CommissionPlan?
+)

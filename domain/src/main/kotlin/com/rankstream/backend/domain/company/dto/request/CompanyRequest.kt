@@ -2,6 +2,7 @@ package com.rankstream.backend.domain.company.dto.request
 
 import com.rankstream.backend.domain.company.dto.validator.CompanyRegistrationConstraint
 import com.rankstream.backend.domain.company.enums.BusinessType
+import com.rankstream.backend.domain.company.enums.CommissionPlan
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
@@ -52,4 +53,9 @@ data class CompanyRegistrationRequest(
 
     val companyPhone: String?,
 
+)
+
+data class CompanyCommissionRequest(
+    @field:NotNull(message = "Commission Plan must not be null")
+    val commissionPlan: CommissionPlan
 )

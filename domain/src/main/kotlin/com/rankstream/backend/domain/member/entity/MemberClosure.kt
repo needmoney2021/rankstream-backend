@@ -10,6 +10,8 @@ import java.util.*
     name = "member_closure",
     indexes = [
         Index(name = "IDX_MEMBER_CLOSURE_ANC_DESC", columnList = "ancestor_idx, descendant_idx"),
+        Index(name = "IDX_MEMBER_CLOSURE_ANCESTOR", columnList = "ancestor_idx"),
+        Index(name = "IDX_MEMBER_CLOSURE_DESCENDANT", columnList = "descendant_idx"),
         Index(name = "IDX_MEMBER_CLOSURE_DEPTH", columnList = "depth")
     ]
 )
@@ -19,11 +21,11 @@ class MemberClosure(
     val idx: Long? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ancestor_idx", nullable = false)
+    @JoinColumn(name = "ancestor_idx", nullable = false, foreignKey = ForeignKey(name = "FK_MEMBER_CLOSURE_ANCESTOR"))
     val ancestor: Member,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "descendant_idx", nullable = false)
+    @JoinColumn(name = "descendant_idx", nullable = false, foreignKey = ForeignKey(name = "FK_MEMBER_CLOSURE_DESCENDANT"))
     val descendant: Member,
 
     @Column(nullable = false)

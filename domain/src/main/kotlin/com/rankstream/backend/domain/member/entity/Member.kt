@@ -14,7 +14,8 @@ import java.util.*
     name = "member",
     indexes = [
         Index(name = "IDX_MEMBER_STATE_COMPANY", columnList = "state, company_idx"),
-        Index(name = "UIDX_MEMBER_ID_COMPANY", columnList = "member_id, company_idx", unique = true)
+        Index(name = "UIDX_MEMBER_ID_COMPANY", columnList = "member_id, company_idx", unique = true),
+        Index(name = "IDX_MEMBER_COMPANY", columnList = "company_idx")
     ]
 )
 class Member(
@@ -43,6 +44,10 @@ class Member(
     @Enumerated(EnumType.STRING)
     @Column(length = 15, nullable = false)
     var state: State,
+
+    @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OrderBy("issuedAt DESC")
+    val gradeHistory: MutableList<MemberGradeHistory> = mutableListOf()
 
 ) : TimestampEntityListener() {
 
