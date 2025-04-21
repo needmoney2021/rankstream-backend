@@ -6,5 +6,6 @@ data class MemberTreeDto(
     val memberName: String,
     val position: String?,
     val gradeIdx: Long,
-    val depth: Int
+    val depth: Int,
+    val parentIdx: Long?
 )

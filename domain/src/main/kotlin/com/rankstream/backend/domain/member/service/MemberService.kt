@@ -186,11 +186,8 @@ class MemberService(
         val links = mutableListOf<TreeLink>()
         for (child in members) {
             if (child.depth == 0) continue
-            val parent = members.find { m ->
-                m.depth == child.depth - 1 && nodeMap[m.idx]?.children?.any { it?.idx == child.idx } != true
-            } ?: continue
 
-            val parentNode = nodeMap[parent.idx] ?: continue
+            val parentNode = nodeMap[child.parentIdx] ?: continue
             val childNode = nodeMap[child.idx] ?: continue
 
             val position = when (child.position) {
@@ -200,12 +197,13 @@ class MemberService(
             }
 
             if (parentNode.children[position] != null) {
-                throw IllegalStateException("Position $position already occupied for parent ${parent.idx}")
+                throw IllegalStateException("Position $position already occupied for parent ${parentNode.idx}")
             }
 
             parentNode.children[position] = childNode
-            links.add(TreeLink(source = parentNode.idx, target = childNode.idx))
+            links.add(TreeLink(source = parentNode.idx, target = child.idx))
         }
+
 
         val rootNode = nodeMap.values.first { it.depth == 0 }
 
@@ -228,20 +226,18 @@ class MemberService(
         }.toMutableMap()
 
         val links = mutableListOf<TreeLink>()
-        for (child in members) {
-            if (child.depth == 0) continue
-            val parent = members.find { m ->
-                m.depth == child.depth - 1 && nodeMap[m.idx]?.children?.any { it.idx == child.idx } != true
-            } ?: continue
 
-            val parentNode = nodeMap[parent.idx] ?: continue
+        for (child in members) {
+            val parentIdx = child.parentIdx ?: continue // 루트 노드는 parent 없음
+            val parentNode = nodeMap[parentIdx] ?: continue
             val childNode = nodeMap[child.idx] ?: continue
 
             parentNode.children.add(childNode)
-            links.add(TreeLink(source = parentNode.idx, target = childNode.idx))
+            links.add(TreeLink(source = parentIdx, target = child.idx))
         }
 
-        val rootNode = nodeMap.values.first { it.depth == 0 }
+        val rootNode = nodeMap.values.firstOrNull { it.depth == 0 }
+            ?: throw IllegalStateException("No root node found in member tree")
 
         return MemberTreeResponse(
             nodes = listOf(rootNode),
@@ -249,6 +245,7 @@ class MemberService(
             isBinary = false
         )
     }
+
 
 
     private fun saveMemberClosure(member: Member, sponsor: Member?) {
