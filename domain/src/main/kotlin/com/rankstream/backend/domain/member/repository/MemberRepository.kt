@@ -43,6 +43,15 @@ interface MemberRepository : JpaRepository<Member, Long> {
     @Modifying(clearAutomatically = true)
     @Query(
         nativeQuery = true,
+        value = """
+            UPDATE member SET sponsor_idx = NULL, recommender_idx = NULL WHERE company_idx = :companyIdx
+        """
+    )
+    fun setRecommenderSponsorNullByCompanyIdx(companyIdx: Long)
+
+    @Modifying(clearAutomatically = true)
+    @Query(
+        nativeQuery = true,
         value ="""
             DELETE FROM member WHERE company_idx = :companyIdx
         """)

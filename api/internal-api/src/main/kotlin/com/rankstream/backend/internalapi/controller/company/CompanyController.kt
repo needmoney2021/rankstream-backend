@@ -29,6 +29,6 @@ class CompanyController(
         @RequestBody @Validated companyCommissionRequest: CompanyCommissionRequest,
         @AuthenticationPrincipal administratorDetails: AdministratorDetails
     ) : ResponseEntity<CompanyCommissionResponse> {
-        TODO()
+        return ResponseEntity.ok(companyService.updateCompanyCommissionPlan(administratorDetails.administrator.company.idx!!, companyCommissionRequest.commissionPlan))
     }
 }

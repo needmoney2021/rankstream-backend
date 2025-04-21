@@ -3,6 +3,7 @@ package com.rankstream.backend.domain.member.service
 import com.rankstream.backend.domain.company.entity.Company
 import com.rankstream.backend.domain.company.enums.CommissionPlan
 import com.rankstream.backend.domain.company.repository.CompanyRepository
+import com.rankstream.backend.domain.grade.entity.Grade
 import com.rankstream.backend.domain.grade.repository.GradeRepository
 import com.rankstream.backend.domain.member.dto.request.MemberRegistrationRequest
 import com.rankstream.backend.domain.member.dto.request.MemberSearchRequest
@@ -13,6 +14,7 @@ import com.rankstream.backend.domain.member.dto.response.MemberResponse
 import com.rankstream.backend.domain.member.dto.response.MemberTreeResponse
 import com.rankstream.backend.domain.member.dto.response.RecommenderSponsorValidationResponse
 import com.rankstream.backend.domain.member.dto.response.TreeLink
+import com.rankstream.backend.domain.member.dto.tree.MemberTreeDto
 import com.rankstream.backend.domain.member.entity.Member
 import com.rankstream.backend.domain.member.entity.MemberClosure
 import com.rankstream.backend.domain.member.entity.MemberGradeHistory
@@ -26,6 +28,7 @@ import com.rankstream.backend.exception.NotFoundException
 import com.rankstream.backend.exception.enums.ErrorCode
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -153,53 +156,58 @@ class MemberService(
         return memberQueryDslRepository.findDetailByMemberIdxAndCompanyIdx(savedMember.idx!!, company.idx!!)!!
     }
 
+
     fun getMemberTree(companyIdx: Long, idx: Long): MemberTreeResponse {
-        val company = companyRepository.findByIdx(companyIdx)
-            ?: notFound(companyIdx)
-        val rootMember = memberRepository.findByCompanyIdxAndIdx(companyIdx, idx)
-            ?: notFound(idx, companyIdx)
-        val plan = company.commissionPlan
-            ?: throw IllegalStateException("Company commission plan is null")
+        val company = companyRepository.findByIdx(companyIdx) ?: notFound(companyIdx)
+        val member = memberRepository.findByCompanyIdxAndIdx(companyIdx, idx) ?: notFound(idx, companyIdx)
+        val plan = company.commissionPlan ?: throw IllegalStateException("commission plan is null")
+
+        val dtoList = memberClosureRepository.findRecursiveTreeByAncestor(member.idx!!)
+        val allGrades = gradeRepository.findByCompany(company)
 
         return if (CommissionPlan.isBinary(plan)) {
-            buildBinaryTree(rootMember, company)
+            buildBinaryTree(dtoList, allGrades)
         } else {
-            buildGeneralTree(rootMember, company)
+            buildGeneralTree(dtoList, allGrades)
         }
     }
 
-    private fun buildBinaryTree(rootMember: Member, company: Company): MemberTreeResponse {
-        val allGrades = gradeRepository.findByCompany(company)
-        val closures = memberClosureRepository.findByAncestor(rootMember)
-            .filter { it.depth > 0 }
-
-        val memberDepthMap = closures.groupBy { it.descendant.idx!! }
-            .mapValues { it.value.minOf { closure -> closure.depth } }
-
-        val members = closures.map { it.descendant }.distinctBy { it.idx }
-
-        val nodeMap = members.associateBy({ it.idx!! }) { member ->
+    private fun buildBinaryTree(members: List<MemberTreeDto>, allGrades: List<Grade>): MemberTreeResponse {
+        val nodeMap = members.associateBy({ it.idx }) { dto ->
             BinaryTreeNode(
-                idx = member.idx!!,
-                id = member.memberId,
-                name = member.memberName,
-                depth = memberDepthMap[member.idx!!] ?: 1,
-                gradeLevel = allGrades.indexOf(member.grade) + 1
+                idx = dto.idx,
+                id = dto.memberId,
+                name = dto.memberName,
+                depth = dto.depth,
+                gradeLevel = allGrades.indexOfFirst { it.idx == dto.gradeIdx } + 1
             )
         }.toMutableMap()
 
-        val rootNode = BinaryTreeNode(
-            idx = rootMember.idx!!,
-            id = rootMember.memberId,
-            name = rootMember.memberName,
-            depth = 0,
-            gradeLevel = allGrades.indexOf(rootMember.grade) + 1
-        )
-        nodeMap[rootMember.idx!!] = rootNode
-
-        val closureMap = closures.groupBy { it.ancestor.idx!! }
         val links = mutableListOf<TreeLink>()
-        connectBinaryTree(rootNode, closureMap, nodeMap, links)
+        for (child in members) {
+            if (child.depth == 0) continue
+            val parent = members.find { m ->
+                m.depth == child.depth - 1 && nodeMap[m.idx]?.children?.any { it?.idx == child.idx } != true
+            } ?: continue
+
+            val parentNode = nodeMap[parent.idx] ?: continue
+            val childNode = nodeMap[child.idx] ?: continue
+
+            val position = when (child.position) {
+                "LEFT" -> 0
+                "RIGHT" -> 1
+                else -> throw IllegalStateException("Invalid binary position for member ${child.idx}")
+            }
+
+            if (parentNode.children[position] != null) {
+                throw IllegalStateException("Position $position already occupied for parent ${parent.idx}")
+            }
+
+            parentNode.children[position] = childNode
+            links.add(TreeLink(source = parentNode.idx, target = childNode.idx))
+        }
+
+        val rootNode = nodeMap.values.first { it.depth == 0 }
 
         return MemberTreeResponse(
             nodes = listOf(rootNode),
@@ -208,56 +216,32 @@ class MemberService(
         )
     }
 
-    private fun connectBinaryTree(
-        parent: BinaryTreeNode,
-        closureMap: Map<Long, List<MemberClosure>>,
-        nodeMap: Map<Long, BinaryTreeNode>,
-        links: MutableList<TreeLink>
-    ) {
-        closureMap[parent.idx]?.forEach { closure ->
-            val child = nodeMap[closure.descendant.idx!!]
-                ?: throw IllegalStateException("Node not found for child")
-            val position = closure.descendant.position
-                ?: throw IllegalStateException("Binary tree member without position")
-
-            parent.children[position] = child
-            links.add(TreeLink(source = parent.idx, target = child.idx))
-            connectBinaryTree(child, closureMap, nodeMap, links)
-        }
-    }
-
-    private fun buildGeneralTree(rootMember: Member, company: Company): MemberTreeResponse {
-        val allGrades = gradeRepository.findByCompany(company)
-        val closures = memberClosureRepository.findByAncestor(rootMember)
-            .filter { it.depth > 0 }
-
-        val memberDepthMap = closures.groupBy { it.descendant.idx!! }
-            .mapValues { it.value.minOf { closure -> closure.depth } }
-
-        val members = closures.map { it.descendant }.distinctBy { it.idx }
-
-        val nodeMap = members.associateBy({ it.idx!! }) { member ->
+    private fun buildGeneralTree(members: List<MemberTreeDto>, allGrades: List<Grade>): MemberTreeResponse {
+        val nodeMap = members.associateBy({ it.idx }) { dto ->
             GeneralTreeNode(
-                idx = member.idx!!,
-                id = member.memberId,
-                name = member.memberName,
-                depth = memberDepthMap[member.idx!!] ?: 1,
-                gradeLevel = allGrades.indexOf(member.grade) + 1
+                idx = dto.idx,
+                id = dto.memberId,
+                name = dto.memberName,
+                depth = dto.depth,
+                gradeLevel = allGrades.indexOfFirst { it.idx == dto.gradeIdx } + 1
             )
         }.toMutableMap()
 
-        val rootNode = GeneralTreeNode(
-            idx = rootMember.idx!!,
-            id = rootMember.memberId,
-            name = rootMember.memberName,
-            depth = 0,
-            gradeLevel = allGrades.indexOf(rootMember.grade) + 1
-        )
-        nodeMap[rootMember.idx!!] = rootNode
-
-        val closureMap = closures.groupBy { it.ancestor.idx!! }
         val links = mutableListOf<TreeLink>()
-        connectGeneralTree(rootNode, closureMap, nodeMap, links)
+        for (child in members) {
+            if (child.depth == 0) continue
+            val parent = members.find { m ->
+                m.depth == child.depth - 1 && nodeMap[m.idx]?.children?.any { it.idx == child.idx } != true
+            } ?: continue
+
+            val parentNode = nodeMap[parent.idx] ?: continue
+            val childNode = nodeMap[child.idx] ?: continue
+
+            parentNode.children.add(childNode)
+            links.add(TreeLink(source = parentNode.idx, target = childNode.idx))
+        }
+
+        val rootNode = nodeMap.values.first { it.depth == 0 }
 
         return MemberTreeResponse(
             nodes = listOf(rootNode),
@@ -265,22 +249,6 @@ class MemberService(
             isBinary = false
         )
     }
-
-    private fun connectGeneralTree(
-        parent: GeneralTreeNode,
-        closureMap: Map<Long, List<MemberClosure>>,
-        nodeMap: Map<Long, GeneralTreeNode>,
-        links: MutableList<TreeLink>
-    ) {
-        closureMap[parent.idx]?.forEach { closure ->
-            val child = nodeMap[closure.descendant.idx!!]
-                ?: throw IllegalStateException("Node not found for child")
-            parent.children.add(child)
-            links.add(TreeLink(source = parent.idx, target = child.idx))
-            connectGeneralTree(child, closureMap, nodeMap, links)
-        }
-    }
-
 
 
     private fun saveMemberClosure(member: Member, sponsor: Member?) {

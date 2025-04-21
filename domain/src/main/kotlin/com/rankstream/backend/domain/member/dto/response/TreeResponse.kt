@@ -19,8 +19,32 @@ data class BinaryTreeNode(
     override val name: String,
     override val depth: Int,
     override val gradeLevel: Int,
-    val children: MutableMap<MemberPosition, BinaryTreeNode> = mutableMapOf()
-) : TreeNode()
+    val children: Array<BinaryTreeNode?> = arrayOfNulls(2)
+) : TreeNode() {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is BinaryTreeNode) return false
+
+        if (idx != other.idx) return false
+        if (depth != other.depth) return false
+        if (gradeLevel != other.gradeLevel) return false
+        if (id != other.id) return false
+        if (name != other.name) return false
+        if (!children.contentEquals(other.children)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = idx.hashCode()
+        result = 31 * result + depth
+        result = 31 * result + gradeLevel
+        result = 31 * result + id.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + children.contentHashCode()
+        return result
+    }
+}
 
 data class GeneralTreeNode(
     override val idx: Long,

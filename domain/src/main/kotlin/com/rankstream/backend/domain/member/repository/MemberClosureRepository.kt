@@ -1,5 +1,6 @@
 package com.rankstream.backend.domain.member.repository
 
+import com.rankstream.backend.domain.member.dto.tree.MemberTreeDto
 import com.rankstream.backend.domain.member.entity.Member
 import com.rankstream.backend.domain.member.entity.MemberClosure
 import org.springframework.data.jpa.repository.JpaRepository
@@ -31,12 +32,25 @@ interface MemberClosureRepository : JpaRepository<MemberClosure, Long> {
     """)
     fun findByDescendant(member: Member): List<MemberClosure>
 
-    @Query("""
-        SELECT m FROM MemberClosure m
-        JOIN FETCH m.ancestor
-        JOIN FETCH m.descendant
-        WHERE m.ancestor = :member AND m.depth > 0
-        ORDER BY m.depth
-    """)
-    fun findByAncestor(member: Member): List<MemberClosure>
+    @Query(
+        nativeQuery = true,
+        value = """
+            WITH RECURSIVE closure_tree AS (
+                SELECT
+                    m.idx, m.member_id, m.member_name, m.position, m.grade_idx, 0 AS depth
+                FROM member m
+                WHERE m.idx = :rootIdx
+                
+                UNION ALL
+                
+                SELECT
+                    child.idx, child.member_id, child.member_name, child.position, child.grade_idx, parent.depth + 1 AS depth
+                FROM member child
+                JOIN member_closure mc ON mc.descendant_idx = child.idx
+                JOIN closure_tree parent ON mc.ancestor_idx = parent.idx AND mc.depth = 1
+            )
+            SELECT * FROM closure_tree
+        """
+    )
+    fun findRecursiveTreeByAncestor(rootIdx: Long): List<MemberTreeDto>
 }
