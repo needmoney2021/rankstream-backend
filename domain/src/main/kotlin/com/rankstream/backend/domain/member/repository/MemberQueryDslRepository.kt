@@ -22,6 +22,7 @@ class MemberQueryDslRepository(
 
     private val member = QMember.member
     private val sponsor = QMember("sponsor")
+    private val recommender = QMember("recommender")
     private val memberClosure = QMemberClosure.memberClosure
     private val memberGradeHistory = QMemberGradeHistory.memberGradeHistory
 
@@ -42,9 +43,13 @@ class MemberQueryDslRepository(
                     sponsor.idx,
                     sponsor.memberId,
                     sponsor.memberName,
+                    recommender.idx,
+                    recommender.memberId,
+                    recommender.memberName,
                     member.state,
                     member.grade().idx,
                     member.grade().gradeName,
+                    member.position,
                     Expressions.constant(emptyList<MemberGradeHistoryResponse>()), // ← 빈 리스트
                     JPAExpressions.select(memberClosure.count())
                         .from(memberClosure)
@@ -60,10 +65,9 @@ class MemberQueryDslRepository(
             )
             .from(member)
             .leftJoin(member.grade())
+            .leftJoin(member.recommender(), recommender)
             .leftJoin(member.company())
-            .leftJoin(memberClosure)
-            .on(memberClosure.descendant().idx.eq(member.idx).and(memberClosure.depth.eq(1)))
-            .leftJoin(sponsor).on(sponsor.idx.eq(memberClosure.ancestor().idx))
+            .leftJoin(member.sponsor(), sponsor)
             .where(
                 member.companyIdxEquals(companyIdx),
                 member.memberIdEquals(memberSearchRequest.id),
@@ -73,6 +77,7 @@ class MemberQueryDslRepository(
             .orderBy(member.createdAt.desc())
             .fetch()
     }
+
 
     // ----------------------------
     // [2] 상세 조회 (gradeHistory 포함)
@@ -91,10 +96,14 @@ class MemberQueryDslRepository(
                     sponsor.idx,
                     sponsor.memberId,
                     sponsor.memberName,
+                    recommender.idx,
+                    recommender.memberId,
+                    recommender.memberName,
                     member.state,
                     member.grade().idx,
                     member.grade().gradeName,
-                    Expressions.constant(emptyList<MemberGradeHistoryResponse>()), // 일단 빈 리스트, 나중에 채움
+                    member.position,
+                    Expressions.constant(emptyList<MemberGradeHistoryResponse>()),
                     JPAExpressions.select(memberClosure.count())
                         .from(memberClosure)
                         .where(
@@ -109,10 +118,9 @@ class MemberQueryDslRepository(
             )
             .from(member)
             .leftJoin(member.grade())
+            .leftJoin(member.recommender(),recommender)
             .leftJoin(member.company())
-            .leftJoin(memberClosure)
-            .on(memberClosure.descendant().idx.eq(member.idx).and(memberClosure.depth.eq(1)))
-            .leftJoin(sponsor).on(sponsor.idx.eq(memberClosure.ancestor().idx))
+            .leftJoin(member.sponsor(), sponsor)
             .where(member.idx.eq(memberIdx))
             .fetchOne()
 
@@ -142,6 +150,7 @@ class MemberQueryDslRepository(
 
         return result.copy(gradeHistory = gradeHistory)
     }
+
 }
 
 

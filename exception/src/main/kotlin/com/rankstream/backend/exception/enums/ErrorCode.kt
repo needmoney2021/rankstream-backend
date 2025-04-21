@@ -21,8 +21,12 @@ enum class ErrorCode(
     // Member Errors
     MEMBER_NOT_FOUND("회원을 찾을 수 없습니다."),
     WRONG_PASSWORD("비밀번호가 잘못되었습니다."),
+    MEMBER_DEACTIVATED("해당 회원이 비활성 상태입니다."),
+    SLOT_IS_OCCUPIED("그 자리에 배치할 수 없습니다."),
     MEMBER_ALREADY_EXISTS("이미 존재하는 회원입니다."),
     INVALID_MEMBER_ID("잘못된 회원 ID입니다."),
+    GENESIS_MEMBER_ALREADY_EXISTS("이미 최초 회원이 존재합니다."),
+
 
     // Company Errors
     COMPANY_NOT_FOUND("회사를 찾을 수 없습니다."),

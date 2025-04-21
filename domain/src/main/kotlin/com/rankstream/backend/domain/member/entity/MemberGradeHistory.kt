@@ -39,5 +39,5 @@ class MemberGradeHistory(
     val member: Member,
 
     @Column(nullable = false)
-    val issuedAt: LocalDateTime
+    val issuedAt: LocalDateTime = LocalDateTime.now()
 )
