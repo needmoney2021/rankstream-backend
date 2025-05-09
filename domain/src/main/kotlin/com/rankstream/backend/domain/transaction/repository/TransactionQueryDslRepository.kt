@@ -44,6 +44,9 @@ class TransactionQueryDslRepository(
                 tx.orderedFrom(transactionSearchRequest.orderedFrom),
                 tx.orderedTo(transactionSearchRequest.orderedTo)
             )
+            .orderBy(
+                tx.orderedAt.desc()
+            )
             .fetch()
     }
 }
