@@ -38,3 +38,6 @@ out/
 ### Kotlin ###
 .kotlin
 .cursor
+
+### ETC ###
+.DS_Store
