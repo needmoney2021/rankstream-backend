@@ -11,7 +11,8 @@ import java.util.*
 @Table(
     name = "grade",
     indexes = [
-        Index(name = "IDX_GRADE_COMPANY", columnList = "company_idx")
+        Index(name = "IDX_GRADE_COMPANY", columnList = "company_idx"),
+        Index(name = "UIDX_GRADE_COMPANY_CODE", columnList = "company_idx, grade_code", unique = true),
     ]
 )
 class Grade(
@@ -22,6 +23,9 @@ class Grade(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_idx", nullable = false)
     val company: Company,
+
+    @Column(length = 20, nullable = false)
+    val gradeCode: String,
 
     @Column(length = 20, nullable = false)
     var gradeName: String,
@@ -37,6 +41,7 @@ class Grade(
         fun create(request: GradeRegistrationRequest, company: Company): Grade {
             return Grade(
                 company = company,
+                gradeCode = request.code,
                 gradeName = request.name,
                 requiredPoint = request.achievementPoint,
                 paybackRatio = request.refundRate

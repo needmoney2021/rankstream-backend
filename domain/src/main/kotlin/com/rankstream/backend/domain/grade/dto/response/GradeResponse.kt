@@ -6,6 +6,7 @@ import java.time.LocalDateTime
 data class GradeResponse(
     val idx: Long,
     val name: String,
+    val code: String,
     val achievementPoint: Double,
     val refundRate: Double,
     val createdAt: LocalDateTime,
@@ -18,6 +19,7 @@ data class GradeResponse(
             return GradeResponse(
                 idx = grade.idx!!,
                 name = grade.gradeName,
+                code = grade.gradeCode,
                 achievementPoint = grade.requiredPoint,
                 refundRate = grade.paybackRatio,
                 createdAt = grade.createdAt,

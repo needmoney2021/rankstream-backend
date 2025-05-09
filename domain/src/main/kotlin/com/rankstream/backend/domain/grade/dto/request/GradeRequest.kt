@@ -15,6 +15,10 @@ data class GradeUpdateRequest(
 )
 
 data class GradeRegistrationRequest(
+
+    @field:NotBlank("Code must not be blank")
+    val code: String,
+
     @field:NotBlank("Name must not be blank")
     val name: String,
 

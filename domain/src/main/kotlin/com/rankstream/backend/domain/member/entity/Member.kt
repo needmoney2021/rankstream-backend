@@ -45,7 +45,7 @@ class Member(
     @JoinColumn(name = "company_idx", nullable = false)
     val company: Company,
 
-    @Column(length = 15, nullable = false)
+    @Column(length = 50, nullable = false)
     val memberName: String,
 
     @Enumerated(EnumType.STRING)
