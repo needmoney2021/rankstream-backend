@@ -12,6 +12,8 @@ enum class ErrorCode(
     DUPLICATED("중복된 데이터가 존재합니다."),
     METHOD_NOT_ALLOWED("허용되지 않은 메소드입니다."),
     UNSUPPORTED_MEDIA_TYPE("지원하지 않는 미디어 타입입니다."),
+    DATE_RANGE_TOO_WIDE("시작 날짜와 종료 날짜 사이가 너무 깁니다. 30일 이내로 줄여서 요청해주세요."),
+    DATE_RANGE_INVALID("시작 날짜가 종료 날짜보다 미래일 수 없습니다."),
 
     // Auth Errors
     TOKEN_EXPIRED("토큰이 만료되었습니다."),
