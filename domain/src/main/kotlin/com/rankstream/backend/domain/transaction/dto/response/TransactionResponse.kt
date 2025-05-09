@@ -16,3 +16,14 @@ data class TransactionResponse(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 )
+
+data class ClosedTransactionResponse(
+    val year: Int,
+    val month: Int,
+    val totalAmount: Double,
+    val totalValueAddedTax: Double,
+    val totalGradePoint: Double,
+    val totalBusinessPoint: Double,
+    val memberIdx: Long,
+    val memberName: String
+)
